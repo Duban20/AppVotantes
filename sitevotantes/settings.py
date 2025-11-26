@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -77,20 +78,26 @@ WSGI_APPLICATION = 'sitevotantes.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
+# BD LOCAL
+# DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': config('MYSQL_NAME'),
+#         'USER': config('MYSQL_USER'),
+#         'PASSWORD': config('MYSQL_PASSWORD'),
+#         'HOST': config('MYSQL_HOST'),
+#         'PORT': config('MYSQL_PORT'),
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#         },
+#     }
+# }
+
+# PRODUCCION
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('MYSQL_NAME'),
-        'USER': config('MYSQL_USER'),
-        'PASSWORD': config('MYSQL_PASSWORD'),
-        'HOST': config('MYSQL_HOST'),
-        'PORT': config('MYSQL_PORT'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
-    }
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
 
 
@@ -149,6 +156,4 @@ LOGIN_REDIRECT_URL = '/personas'
 LOGOUT_REDIRECT_URL = '/'  
 # ---------------------
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://appvotantes-production.up.railway.app',
-]
+CSRF_TRUSTED_ORIGINS = ['https://appvotantes-production.up.railway.app',]
