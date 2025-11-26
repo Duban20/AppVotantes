@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block title %}Gestión de Personas{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+            {% include 'partials/messages.html' %}
+
+            <div class="row g-3 align-items-center mb-3">
+                
+                <div class="col-md-6">
+                    <h2 class="h4 mb-0 fw-bold" style="color: var(--color-text);">
+                        Gestión de Personas
+                    </h2>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <div class="d-inline-flex gap-2">
+                        <a href="{% url 'exportar_votantes' %}" class="btn btn-success rounded-pill px-3 shadow-sm text-white">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel
+                        </a>
+                        
+                        {% if perms.appformulario.add_votante %}
+                        <a href="{% url 'crear_votante' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-person-plus me-2"></i>Agregar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 align-items-center mb-4 pb-2 border-bottom">
+                
+                <div class="col-md-4">
+                    <form method="get" action="" class="d-flex align-items-center gap-2">
+                        <div class="input-group flex-grow-1">
+                            <input type="text" name="q" class="form-control rounded-start-pill"
+                                placeholder="Busca por nombre o cédula..."
+                                value="{{ query|default:'' }}">
+                            
+                            <button type="submit" class="btn btn-secondary" title="Buscar">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        
+                        {% if query %}
+                            <a href="{% url 'lista_votantes' %}?status={{ status_filter|default:'' }}" 
+                            class="btn btn-outline-secondary rounded-circle" 
+                            title="Limpiar búsqueda" 
+                            style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <div class="col-md-3">
+                    </div>
+
+                <div class="col-md-5 d-flex justify-content-end">
+                    <span class="small text-muted me-2 mt-1 d-none d-md-block">Filtrar por estado:</span>
+                    
+                    <div class="btn-group" role="group" aria-label="Filtro de Estado">
+                        
+                        <a href="{% url 'lista_votantes' %}?q={{ query|default:'' }}" 
+                        class="btn btn-sm {% if not status_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+                            Todos
+                        </a>
+                        
+                        <a href="{% url 'lista_votantes' %}?status=ACTIVE{% if query %}&q={{ query }}{% endif %}" 
+                        class="btn btn-sm {% if status_filter == 'ACTIVE' %}btn-dark{% else %}btn-outline-success{% endif %}">
+                            Activos
+                        </a>
+                        
+                        <a href="{% url 'lista_votantes' %}?status=INACTIVE{% if query %}&q={{ query }}{% endif %}" 
+                        class="btn btn-sm {% if status_filter == 'INACTIVE' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+                            Inactivos
+                        </a>
+                    </div>
+                </div>
+            </div>
+                
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0 text-nowrap">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0">Nombre Completo</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Cédula</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Edad</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Líder</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Puesto</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Estado</th>
+                                <th class="py-3 pe-4 text-end text-uppercase text-secondary small fw-bold border-0">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            {% for v in votantes %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ v.nombre }} {{ v.apellido }}</div>
+                                </td>
+                                
+                                <td class="text-muted font-monospace small">{{ v.cedula }}</td>
+                                <td class="text-muted small">{{ v.telefono }}</td>
+                                <td>{{ v.edad }}</td>
+                                <td>{{ v.lider }}</td>
+                                <td>{{ v.municipio_nacimiento }}</td>
+                                
+                                <td class="text-truncate" style="max-width: 150px;" title="{{ v.puesto_votacion }}">
+                                    {{ v.puesto_votacion }}
+                                </td>
+
+                                <td>
+                                    {% if v.status == "ACTIVE" %}
+                                        <span class="badge bg-success text-white rounded-pill fw-normal">
+                                            {{ v.get_status_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary text-white rounded-pill fw-normal">
+                                            {{ v.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    {% if perms.appformulario.change_votante %}
+                                    <a href="{% url 'editar_votante' v.id %}"                                      
+                                       class="btn btn-sm btn-outline-primary border-0 p-1"
+                                       title="Editar">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Botón de CAMBIAR ESTADO -->
+                                    {% if v.status == "ACTIVE" %}
+                                        <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                           class="btn btn-sm btn-outline-secondary border-0 p-1"
+                                           onclick="return confirm('¿Seguro que deseas INACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
+                                           title="Inactivar">
+                                            <i class="bi bi-x-circle-fill fs-5"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                           class="btn btn-sm btn-outline-success border-0 p-1" 
+                                           onclick="return confirm('¿Seguro que deseas REACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
+                                           title="Reactivar">
+                                            <i class="bi bi-x-circle-fill fs-5"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if perms.appformulario.delete_votante %}
+                                    <a href="{% url 'eliminar_votante' v.id %}" 
+                                       class="btn btn-sm btn-outline-danger border-0 p-1"
+                                       onclick="return confirm('¿Seguro que deseas eliminar este votante?');"
+                                       title="Eliminar">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    {% if query %}
+                                        <i class="bi bi-search display-6 d-block mb-3 opacity-25"></i>
+                                        No se encontraron resultados para "<strong>{{ query }}</strong>".
+                                        <br>
+                                        <a href="{% url 'lista_votantes' %}" class="text-decoration-none mt-2 d-inline-block">Limpiar búsqueda</a>
+                                    {% else %}
+                                        <i class="bi bi-people display-6 d-block mb-3 opacity-25"></i>
+                                        No hay votantes registrados aún.
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-3 ms-2">
+            <a href="/" class="text-decoration-none text-muted small hover-link">
+                <i class="bi bi-arrow-left me-1"></i> Volver 
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-5">
+                    <h2 class="h4 fw-bold" style="color: var(--color-text);">{{ titulo }}</h2>
+                    <p class="text-muted small">Defina la ubicación y detalles del puesto.</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- NOMBRE LUGAR -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
+                            {{ form.nombre_lugar.label }}
+                        </label>
+
+                        <div class="input-group">
+                            {{ form.nombre_lugar }}
+                        </div>
+
+                        {% if form.nombre_lugar.help_text %}
+                            <div class="form-text mt-2 small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>{{ form.nombre_lugar.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in form.nombre_lugar.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- APLICA DIRECCIÓN (PERSONALIZADO) -->
+                    <div class="mb-4 p-3 bg-light rounded border border-light">
+                        <label class="form-label small fw-bold text-dark mb-3 d-block">
+                            {{ form.aplica_direccion.label }}
+                        </label>
+
+                        <div class="d-none">
+                            {{ form.aplica_direccion }}
+                        </div>
+
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="radio_visual_aplica" id="radio_si">
+                                <label class="form-check-label" for="radio_si">
+                                    Sí, tiene dirección
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="radio_visual_aplica" id="radio_no">
+                                <label class="form-check-label text-muted" for="radio_no">
+                                    No aplica (N/A)
+                                </label>
+                            </div>
+                        </div>
+
+                        {% if form.aplica_direccion.help_text %}
+                            <div class="form-text mt-2 small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>{{ form.aplica_direccion.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in form.aplica_direccion.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- DIRECCIÓN -->
+                    <div class="mb-4" id="div_direccion">
+                        <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
+                            {{ form.direccion.label }}
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-geo-alt"></i></span>
+                            {{ form.direccion }}
+                        </div>
+
+                        {% if form.direccion.help_text %}
+                            <div class="form-text mt-2 small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>{{ form.direccion.help_text }}
+                            </div>
+                        {% else %}
+                            <div class="form-text mt-2 small text-muted">
+                                Ej. Calle 10 # 5-20
+                            </div>
+                        {% endif %}
+
+                        {% for error in form.direccion.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- MUNICIPIO -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
+                            {{ form.municipio.label }}
+                        </label>
+
+                        {{ form.municipio }}
+
+                        {% if form.municipio.help_text %}
+                            <div class="form-text mt-2 small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>{{ form.municipio.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in form.municipio.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="d-grid gap-2 mt-5">
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill shadow-sm">
+                            Guardar Puesto
+                        </button>
+                        
+                        <a href="{% url 'lista_puestos' %}" class="btn btn-link text-decoration-none text-muted small text-center">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. Obtenemos referencias a los elementos
+    const checkboxReal = document.getElementById("id_aplica_direccion"); // El campo oculto de Django
+    const radioSi = document.getElementById("radio_si");
+    const radioNo = document.getElementById("radio_no");
+    
+    const direccionDiv = document.getElementById("div_direccion");
+    const direccionInput = document.getElementById("id_direccion");
+
+    // 2. Función principal de lógica
+    function actualizarEstado() {
+        if (radioNo.checked) {
+            // --- CASO: NO APLICA ---
+            direccionDiv.style.display = "none";     // Ocultar input visualmente
+            direccionInput.value = "N/A";            // Poner N/A
+            checkboxReal.checked = false;            // Desmarcar el checkbox real para Django
+        } else {
+            // --- CASO: SÍ APLICA ---
+            direccionDiv.style.display = "block";    // Mostrar input
+            if (direccionInput.value === "N/A") {
+                direccionInput.value = "";           // Limpiar si decía N/A
+            }
+            checkboxReal.checked = true;             // Marcar el checkbox real para Django
+        }
+    }
+
+    // 3. Detectar estado inicial 
+    // Si el checkbox real viene marcado desde la BD, activamos el radio "Sí"
+    // Si la dirección es "N/A" o el checkbox está desmarcado, activamos "No"
+    if (checkboxReal.checked && direccionInput.value !== "N/A") {
+        radioSi.checked = true;
+    } else {
+        radioNo.checked = true;
+    }
+    // Ejecutamos la lógica visual inicial
+    actualizarEstado();
+
+    // 4. Escuchar cambios en los radios
+    radioSi.addEventListener("change", actualizarEstado);
+    radioNo.addEventListener("change", actualizarEstado);
+});
+</script>
+
+{% endblock %}

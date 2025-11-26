@@ -1,0 +1,74 @@
+<!-- {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show auto-dismiss" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<script>
+    // Ocultar alertas automáticamente después de 4 segundos
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.auto-dismiss');
+        alerts.forEach(function(alert) {
+            var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        });
+    }, 5000); // 5 segundos
+</script> -->
+
+{% if messages %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="mb-4">
+                {% for message in messages %}
+                    
+                    {% comment %} Determinar el color base y el icono {% endcomment %}
+                    {% if message.tags == 'success' %}
+                        {% with alert_class="bg-success-subtle text-success border-success" icon_class="bi-check-circle-fill" %}
+                        {% endwith %}
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}
+                        {% with alert_class="bg-danger-subtle text-danger border-danger" icon_class="bi-x-octagon-fill" %}
+                        {% endwith %}
+                    {% elif message.tags == 'warning' %}
+                        {% with alert_class="bg-warning-subtle text-warning border-warning" icon_class="bi-exclamation-triangle-fill" %}
+                        {% endwith %}
+                    {% else %}
+                        {% with alert_class="bg-info-subtle text-info border-info" icon_class="bi-info-circle-fill" %}
+                        {% endwith %}
+                    {% endif %}
+
+                    <div class="alert {{ alert_class }} alert-dismissible fade show custom-alert shadow-sm border-start border-4 auto-dismiss" role="alert">
+                        <div class="d-flex align-items-center">
+                            
+                            <i class="bi {{ icon_class }} me-3 fs-5"></i>
+                            
+                            <div class="small fw-medium">
+                                {{ message }}
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cierra automáticamente las alertas con la clase 'auto-dismiss' después de 5 segundos
+        document.querySelectorAll('.auto-dismiss').forEach(function(alert) {
+            setTimeout(function() {
+                // Usa la función de Bootstrap para cerrar la alerta
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 3000); 
+        });
+    });
+</script>

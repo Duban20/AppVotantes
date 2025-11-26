@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8"> <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-5">
+                    <h2 class="h3 fw-bold" style="color: var(--color-text);">
+                        {{ titulo }}
+                    </h2>
+                    <p class="text-muted">
+                        Complete la información del votante a continuación.
+                    </p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="mb-4 col-md-6">
+                            
+                            <!-- Label -->
+                            <label class="form-label small fw-bold text-secondary text-uppercase">
+                                {{ field.label }}
+                            </label>
+                            
+                            <!-- Input -->
+                            <div class="input-group">
+                                {{ field }}
+                            </div>
+
+                            <!-- Help Text -->
+                            <div class="form-text mt-2 small text-muted d-flex align-items-start">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <span>{{ field.help_text }}</span>
+                            </div>
+
+                            <!-- Errors -->
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1 fw-medium">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
+                        <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
+                            Guardar Datos
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

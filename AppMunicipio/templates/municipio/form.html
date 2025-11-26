@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-4">
+                    <h2 class="h4 fw-bold" style="color: var(--color-text);">
+                        {{ titulo }}
+                    </h2>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="mb-4">
+
+                        <!-- Label -->
+                        <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
+                            {{ field.label }}
+                        </label>
+
+                        <!-- Input -->
+                        <div class="input-group">
+                            {{ field }}
+                        </div>
+
+                        <!-- Help Text -->
+                        {% if field.help_text %}
+                            <div class="form-text mt-2 small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Errors -->
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger py-2 mt-2 small border-0 bg-danger bg-opacity-10 text-white">
+                                <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-grid gap-2 mt-5">
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill shadow-sm">
+                            Guardar
+                        </button>
+                        
+                        <a href="{% url 'lista_municipios' %}" class="btn btn-link text-decoration-none text-muted small">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
