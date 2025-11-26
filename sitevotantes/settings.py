@@ -164,4 +164,4 @@ LOGIN_REDIRECT_URL = '/personas'
 LOGOUT_REDIRECT_URL = '/'  
 # ---------------------
 
-CSRF_TRUSTED_ORIGINS = ['https://appvotantes-production.up.railway.app',]
+CSRF_TRUSTED_ORIGINS = ['http://*','https://appvotantes-production.up.railway.app',]
