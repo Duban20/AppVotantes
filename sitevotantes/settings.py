@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['appvotantes-production.up.railway.app','localhost','127.0.0.1']
 
 
 # Application definition
@@ -149,3 +149,6 @@ LOGIN_REDIRECT_URL = '/personas'
 LOGOUT_REDIRECT_URL = '/'  
 # ---------------------
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://appvotantes-production.up.railway.app',
+]
