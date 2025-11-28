@@ -3,13 +3,13 @@ from .models import Municipio
 
 
 class MunicipioAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
+    list_display = ('nombre', 'departamento', 'status')
+    search_fields = ('nombre', 'departamento__nombre')
     ordering = ('nombre',)
 
     fieldsets = (
         ('Información del Municipio / Corregimiento', {
-            'fields': ('nombre',)
+            'fields': ('nombre', 'departamento', 'status'),
         }),
     )
 

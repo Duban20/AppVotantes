@@ -88,32 +88,91 @@
                     <table class="table table-hover align-middle mb-0 text-nowrap">
                         <thead class="table-light sticky-top">
                             <tr>
-                                <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0">Nombre Completo</th>
+                                <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0">Nombres</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Apellidos</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Cédula</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Edad</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
+
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Líder</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Puesto</th>
+
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Mesa (N°)</th>
+
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Puesto de votación</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio del puesto</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección del puesto</th>                              
+
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio de nacimiento</th>
+
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Estado</th>
+
                                 <th class="py-3 pe-4 text-end text-uppercase text-secondary small fw-bold border-0">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="border-top-0">
                             {% for v in votantes %}
                             <tr>
-                                <td class="ps-4">
-                                    <div class="fw-bold text-dark">{{ v.nombre }} {{ v.apellido }}</div>
+                                <td class="ps-4">{{ v.nombre }}</td>
+                                <td>{{ v.apellido }}</td>
+                                <td class="text-muted font-monospace small">{{ v.cedula }}</td>
+                                <td>{{ v.edad }}</td>
+                                <td class="text-muted small">{{ v.telefono }}</td>
+
+                                <!-- LÍDER: solo nombre -->
+                                <td>
+                                    {% if v.lider %}
+                                        {{ v.lider.nombre }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- MESA: solo número -->
+                                <td>
+                                    {% if v.mesa %}
+                                        {{ v.mesa.numero }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- NOMBRE DEL PUESTO -->
+                                <td>
+                                    {% if v.mesa and v.mesa.puesto_votacion %}
+                                        {{ v.mesa.puesto_votacion.nombre_lugar }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- MUNICIPIO – DEPARTAMENTO (PUESTO) -->
+                                <td>
+                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio %}
+                                        {% with m=v.mesa.puesto_votacion.municipio %}
+                                            {{ m.nombre }}{% if m.departamento %} – {{ m.departamento.nombre }}{% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- DIRECCIÓN DEL PUESTO -->
+                                <td>
+                                    {% if v.mesa and v.mesa.puesto_votacion %}
+                                        {{ v.mesa.puesto_votacion.direccion }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
                                 </td>
                                 
-                                <td class="text-muted font-monospace small">{{ v.cedula }}</td>
-                                <td class="text-muted small">{{ v.telefono }}</td>
-                                <td>{{ v.edad }}</td>
-                                <td>{{ v.lider }}</td>
-                                <td>{{ v.municipio_nacimiento }}</td>
-                                
-                                <td class="text-truncate" style="max-width: 150px;" title="{{ v.puesto_votacion }}">
-                                    {{ v.puesto_votacion }}
+
+                                <!-- MUNICIPIO – DEPARTAMENTO (NACIMIENTO) -->
+                                <td>
+                                    {% if v.municipio_nacimiento %}
+                                        {{ v.municipio_nacimiento.nombre }}{% if v.municipio_nacimiento.departamento %} – {{ v.municipio_nacimiento.departamento.nombre }}{% endif %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
                                 </td>
 
                                 <td>

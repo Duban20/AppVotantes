@@ -39,9 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
-    'appformulario.apps.AppformularioConfig',
-    'AppPuestoVotacion.apps.AppPuestoVotacionConfig',
+    'appdepartamento.apps.AppdepartamentoConfig',
     'AppMunicipio.apps.AppMunicipioConfig',
+    'AppPuestoVotacion.apps.AppPuestoVotacionConfig',
+    'appmesa.apps.AppmesaConfig',
+    'applider.apps.AppliderConfig',
+    'appformulario.apps.AppformularioConfig',
 ]
 
 MIDDLEWARE = [
@@ -94,6 +97,7 @@ WSGI_APPLICATION = 'sitevotantes.wsgi.application'
 #     }
 # }
 
+# Produccion postgres
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

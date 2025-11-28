@@ -1,28 +1,29 @@
 from django import forms
 
 from AppMunicipio.models import Municipio
-from AppPuestoVotacion.models import PuestoVotacion
+from appmesa.models import Mesa
 from .models import votante
 
 class VotanteForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # 1. Aplicar filtro para Puestos de Votación (solo ACTIVO)
-        self.fields['puesto_votacion'].queryset = PuestoVotacion.objects.filter(
+        # 1. Filtrar Mesas activas
+        self.fields['mesa'].queryset = Mesa.objects.filter(
             status='ACTIVE'
-        ).order_by('nombre_lugar')
+        ).order_by('numero')
 
-        # 2. Aplicar filtro para Municipios (solo ACTIVO)
+        # 2. Filtrar Municipios activos
         self.fields['municipio_nacimiento'].queryset = Municipio.objects.filter(
             status='ACTIVE'
         ).order_by('nombre')
-        
+
     class Meta:
         model = votante
         fields = [
             'nombre', 'apellido', 'cedula', 'edad', 'telefono',
-            'puesto_votacion', 'lider', 'municipio_nacimiento'
+            'mesa', 'lider', 'municipio_nacimiento'
         ]
 
         widgets = {
@@ -31,7 +32,7 @@ class VotanteForm(forms.ModelForm):
             'cedula': forms.TextInput(attrs={'class': 'form-control'}),
             'edad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'puesto_votacion': forms.Select(attrs={'class': 'form-select'}),
-            'lider': forms.TextInput(attrs={'class': 'form-control'}),
+            'mesa': forms.Select(attrs={'class': 'form-select'}),
+            'lider': forms.Select(attrs={'class': 'form-select'}), 
             'municipio_nacimiento': forms.Select(attrs={'class': 'form-select'}),
         }

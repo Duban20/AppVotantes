@@ -1,4 +1,5 @@
 from django.db import models
+from appdepartamento.models import Departamento
 
 class Municipio(models.Model):
     STATUS_CHOICES = [
@@ -11,6 +12,13 @@ class Municipio(models.Model):
         unique=True,
         verbose_name="Nombre del Municipio / Corregimiento",
         help_text="Ingrese el nombre del municipio o corregimiento."
+    )
+
+    departamento = models.ForeignKey(
+        Departamento,
+        on_delete=models.PROTECT, 
+        verbose_name="Departamento",
+        help_text="Seleccione."
     )
 
     status = models.CharField(
@@ -26,4 +34,4 @@ class Municipio(models.Model):
         verbose_name_plural = "Municipios / Corregimientos"
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} – {self.departamento}"

@@ -1,7 +1,8 @@
 from django.db import models
 
 from AppMunicipio.models import Municipio
-from AppPuestoVotacion.models import PuestoVotacion
+from applider.models import Lider
+from appmesa.models import Mesa
 
 class votante(models.Model):
     STATUS_CHOICES = [
@@ -14,18 +15,23 @@ class votante(models.Model):
     cedula = models.CharField(max_length=12, verbose_name="Cédula", help_text="Ingrese la cédula sin guiones ni espacios.", unique=True)
     edad = models.IntegerField(help_text="Ingrese la edad actual.") 
     telefono = models.CharField(max_length=100, verbose_name="Teléfono", help_text="Ingrese un número de contacto.")
-    lider = models.CharField(max_length=100, verbose_name="Líder", help_text="Nombre del líder de equipo.") 
-    puesto_votacion = models.ForeignKey(
-        PuestoVotacion,
-        on_delete=models.PROTECT, 
-        null=True,                
-        verbose_name="Lugar de Votación",
-        help_text="Seleccione el puesto de votación."
+    
+    lider = models.ForeignKey(
+        Lider,
+        on_delete=models.PROTECT,
+        blank=True, null=True,
+        verbose_name="Líder",
+        help_text="Seleccione el líder responsable del votante."
+    )
+    mesa = models.ForeignKey(
+        Mesa,
+        on_delete=models.PROTECT,                
+        verbose_name="Mesa de Votación",
+        help_text="Seleccione."
     )
     municipio_nacimiento = models.ForeignKey(
         Municipio,
         on_delete=models.PROTECT,
-        null=True,
         verbose_name="Lugar de nacimiento.",
         help_text="Seleccione el lugar de nacimiento."
     ) 
@@ -38,8 +44,11 @@ class votante(models.Model):
     )
 
     def __str__(self):
-        # Muestra el nombre completo del puesto de votación en la interfaz
-        return f"{self.nombre} {self.apellido} - {self.puesto_votacion}"
+        return f"{self.nombre} {self.apellido} - {self.mesa.numero}"
+
+    @property
+    def puesto_votacion(self):
+        return self.mesa.puesto_votacion if self.mesa else None
 
     class Meta:
         verbose_name = "votante"
