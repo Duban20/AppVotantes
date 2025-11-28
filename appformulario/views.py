@@ -4,7 +4,7 @@ from django.db.models import ProtectedError
 from django.http import HttpResponse
 from django.contrib import messages
 from openpyxl import load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.db.models import Q
 from .forms import VotanteForm
 from .models import votante
@@ -161,20 +161,68 @@ def exportar_votantes_excel(request):
     header_font = Font(bold=True, color="FFFFFF", size=11)
     ws.freeze_panes = 'A2'
 
-    # Encabezados
+    ws = wb.active
+
+    # -----------------------------------------
+    # ESTILOS
+    # -----------------------------------------
+    header_fill = PatternFill(start_color="404040", end_color="404040", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+
+    zebra_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # Congelar encabezado
+    ws.freeze_panes = 'A2'
+
+    # -----------------------------------------
+    # ESTILAR ENCABEZADO
+    # -----------------------------------------
     for cell in ws[1]:
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal='center')
+        cell.alignment = Alignment(horizontal='center', wrap_text=True)
+        cell.border = thin_border
 
-    # Auto ancho columnas
+    # Activar auto-filtros
+    ws.auto_filter.ref = ws.dimensions
+
+    # -----------------------------------------
+    # ZEBRA + BORDES + WRAP TEXT
+    # -----------------------------------------
+    for row_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
+        # Zebra: filas pares = gris suave
+        if row_idx % 2 == 0:
+            for cell in row:
+                cell.fill = zebra_fill
+
+        # Bordes y ajuste de texto para todas las celdas
+        for cell in row:
+            cell.border = thin_border
+            cell.alignment = Alignment(wrap_text=True, vertical='top')
+
+    # -----------------------------------------
+    # AUTO-ANCHO DE COLUMNAS (con límite)
+    # -----------------------------------------
     for col in ws.columns:
         max_len = 0
         col_letter = col[0].column_letter
+
         for cell in col:
             if cell.value:
                 max_len = max(max_len, len(str(cell.value)))
+
+        # Evita columnas gigantes (máximo 40 caracteres de ancho)
+        max_len = min(max_len, 40)
+
         ws.column_dimensions[col_letter].width = max_len + 3
+
 
     # Exportar archivo
     output = BytesIO()
