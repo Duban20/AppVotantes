@@ -82,20 +82,6 @@
             border-color: var(--color-text);
             transform: translateY(-1px);
         }
-        
-        /* Estilo para el icono de logout */
-        .btn-logout-icon {
-            color: #dc2626 !important; /* Rojo suave */
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-        .btn-logout-icon:hover {
-            background-color: #fee2e2;
-        }
 
         /* --- Footer --- */
         footer {
@@ -103,6 +89,58 @@
             border-top: 1px solid #e2e8f0;
             color: #94a3b8;
             font-size: 0.85rem;
+        }
+
+        /* --- Botón de Logout --- */
+        .btn-logout-minimal {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #6c757d; /* Color gris suave por defecto */
+            padding: 8px 16px;
+            border-radius: 50px; /* Forma de píldora */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .btn-logout-minimal:hover {
+            color: #dc3545; /* Rojo Bootstrap */
+            background-color: rgba(220, 53, 69, 0.1); /* Fondo rojo muy sutil */
+            border-color: rgba(220, 53, 69, 0.2);
+            transform: translateY(-1px); /* Pequeña elevación */
+        }
+
+        .btn-logout-minimal i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-logout-minimal:hover i {
+            transform: translateX(3px); /* El icono se mueve un poco a la derecha */
+        }
+
+        /* --- Caja de Saludo de Usuario --- */
+        .user-greeting-box {
+            display: flex;
+            align-items: baseline; /* Alinea el texto en la base */
+            gap: 5px;
+            padding: 0 10px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .greeting-text {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .username-text {
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 700; /* Negrita para destacar el nombre */
+            letter-spacing: -0.3px;
+            position: relative;
         }
     </style>
 </head>
@@ -123,7 +161,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="/">Inicio</a>
                 </li>
 
@@ -137,19 +175,22 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="/municipios/">Municipios</a>
-                </li>
+                </li> -->
 
                 {% if user.is_authenticated %}
+                    <li class="nav-item ms-3 d-flex align-items-center">
+                        <div class="user-greeting-box">
+                            <span class="greeting-text">Hola,</span>
+                            <span class="username-text">{{ user.username }}</span>
+                        </div>
+                    </li>
                     <li class="nav-item ms-3">
                         <form action="/logout/" method="post">
                             {% csrf_token %} 
-                            <button type="submit" class="nav-link btn-logout-icon border-0 bg-transparent" title="Cerrar Sesión">
+                            <button type="submit" class="btn-logout-minimal" title="Cerrar Sesión">
                                 <i class="bi bi-box-arrow-right"></i>
-                            </button>
+                                <span class="d-none d-md-inline ms-2 text-sm">Cerrar Sesión</span> </button>
                         </form>
-                    </li>
-                    <li class="nav-item">
-                        <span class="nav-link text-muted small">{{ user.username }}</span>
                     </li>
                 {% else %}
                     <li class="nav-item">
