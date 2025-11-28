@@ -110,26 +110,25 @@ def cambiar_estado_votante(request, pk):
 # -----------------------------------------------------------------------
 # Función para exportar a Excel
 def exportar_votantes_excel(request):
-    # 1. Obtener datos (solo ACTIVOS)
+
+    # Obtener solo votantes activos
     votantes = votante.objects.filter(status='ACTIVE').select_related(
-        'puesto_votacion', 
-        'puesto_votacion__municipio', 
-        'municipio_nacimiento'
+        'mesa',
+        'mesa__puesto_votacion',
+        'mesa__puesto_votacion__municipio',
+        'municipio_nacimiento',
+        'lider'
     )
 
-    # 2. Construir datos
     data = []
     for v in votantes:
-        # Lógica para campos vacíos del puesto
-        nombre_puesto = ''
-        municipio_puesto = ''
-        direccion_puesto = ''
-        
-        if v.puesto_votacion:
-            nombre_puesto = v.puesto_votacion.nombre_lugar
-            direccion_puesto = v.puesto_votacion.direccion
-            if v.puesto_votacion.municipio:
-                municipio_puesto = str(v.puesto_votacion.municipio)
+
+        # Datos del puesto de votación (propiedad del modelo)
+        puesto = v.puesto_votacion  # esto viene de @property
+
+        nombre_puesto = puesto.nombre_lugar if puesto else ''
+        direccion_puesto = puesto.direccion if puesto else ''
+        municipio_puesto = puesto.municipio.nombre if puesto and puesto.municipio else ''
 
         data.append({
             'Nombres': v.nombre,
@@ -137,18 +136,19 @@ def exportar_votantes_excel(request):
             'Cédula': v.cedula,
             'Edad': v.edad,
             'Teléfono': v.telefono,
-            'Líder': v.lider,
+            'Líder': v.lider.nombre if v.lider else '',
             'Municipio de Nacimiento': v.municipio_nacimiento.nombre if v.municipio_nacimiento else '',
             'Lugar de Votación': nombre_puesto,
             'Municipio del Puesto': municipio_puesto,
             'Dirección del Puesto': direccion_puesto,
-            # 'Estado': v.get_status_display() # Retorna "Activo" o "Inactivo"
+            'Mesa': v.mesa.numero,
         })
 
-    # 3. Crear DataFrame y escribir a memoria
+    # Crear DataFrame
     df = pd.DataFrame(data)
     buffer = BytesIO()
-    
+
+    # Escribir Excel inicial
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Votantes')
 
@@ -156,72 +156,35 @@ def exportar_votantes_excel(request):
     wb = load_workbook(buffer)
     ws = wb.active
 
-    # --- DEFINICIÓN DE ESTILOS ---
-    
-    # 1. Estilo para el Encabezado (Gris Oscuro con texto blanco)
+    # Estilos
     header_fill = PatternFill(start_color="404040", end_color="404040", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF", size=11)
-    
-    # # 2. Estilos para el Estado 
-    # # Verde Success (#198754)
-    # success_fill = PatternFill(start_color="198754", end_color="198754", fill_type="solid")
-    # # Gris Secondary (#6C757D)
-    # secondary_fill = PatternFill(start_color="6C757D", end_color="6C757D", fill_type="solid")
-    # # Texto Blanco para que contraste con el fondo de color
-    # white_font = Font(color="FFFFFF")
+    ws.freeze_panes = 'A2'
 
-    # --- APLICAR ESTILOS ---
-
-    # 1. Aplicar estilo al encabezado y buscar índice de columna "Estado"
-    ws.freeze_panes = 'A2' # Congelar encabezado
-    estado_col_index = None
-
-    for cell in ws[1]: # Recorrer primera fila
+    # Encabezados
+    for cell in ws[1]:
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal='center') # Centrar títulos
-        
-    #     # Detectar cuál columna es "Estado"
-    #     if cell.value == "Estado":
-    #         estado_col_index = cell.column # Guarda el número de columna (ej. 11)
+        cell.alignment = Alignment(horizontal='center')
 
-    # # 2. Aplicar colores condicionales a la columna Estado
-    # # Iteramos desde la fila 2 hasta el final
-    # if estado_col_index:
-    #     for row in range(2, ws.max_row + 1):
-    #         cell = ws.cell(row=row, column=estado_col_index)
-            
-    #         # Verificamos el texto. Ajusta "Activo" según lo que devuelva get_status_display()
-    #         if cell.value == "Activo": 
-    #             cell.fill = success_fill
-    #             cell.font = white_font
-    #         else:
-    #             cell.fill = secondary_fill
-    #             cell.font = white_font
-            
-    #         # Centrar el texto del estado 
-    #         cell.alignment = Alignment(horizontal='center')
-
-    # 3. Ajustar ancho de columnas
-    for column_cells in ws.columns:
-        max_length = 0
-        column = column_cells[0].column_letter
-        for cell in column_cells:
+    # Auto ancho columnas
+    for col in ws.columns:
+        max_len = 0
+        col_letter = col[0].column_letter
+        for cell in col:
             if cell.value:
-                try:
-                    max_length = max(max_length, len(str(cell.value)))
-                except:
-                    pass
-        ws.column_dimensions[column].width = max_length + 3
+                max_len = max(max_len, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = max_len + 3
 
-    # Guardar y Retornar
-    buffer = BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
+    # Exportar archivo
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
 
     response = HttpResponse(
-        buffer,
+        output,
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename=Listado_Votantes.xlsx'
+
     return response
