@@ -93,19 +93,12 @@
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Cédula</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
-
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Líder</th>
-
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Mesa (N°)</th>
-
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Puesto de votación</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio del puesto</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección del puesto</th>                              
-
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio de nacimiento</th>
-
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Estado</th>
-
                                 <th class="py-3 pe-4 text-end text-uppercase text-secondary small fw-bold border-0">Acciones</th>
                             </tr>
                         </thead>
@@ -164,16 +157,6 @@
                                         —
                                     {% endif %}
                                 </td>
-                                
-
-                                <!-- MUNICIPIO – DEPARTAMENTO (NACIMIENTO) -->
-                                <td>
-                                    {% if v.municipio_nacimiento %}
-                                        {{ v.municipio_nacimiento.nombre }}{% if v.municipio_nacimiento.departamento %} – {{ v.municipio_nacimiento.departamento.nombre }}{% endif %}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
 
                                 <td>
                                     {% if v.status == "ACTIVE" %}
@@ -196,21 +179,23 @@
                                     </a>
                                     {% endif %}
 
-                                    <!-- Botón de CAMBIAR ESTADO -->
-                                    {% if v.status == "ACTIVE" %}
-                                        <a href="{% url 'cambiar_estado_votante' v.id %}" 
-                                           class="btn btn-sm btn-outline-secondary border-0 p-1"
-                                           onclick="return confirm('¿Seguro que deseas INACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
-                                           title="Inactivar">
-                                            <i class="bi bi-x-circle-fill fs-5"></i>
-                                        </a>
-                                    {% else %}
-                                        <a href="{% url 'cambiar_estado_votante' v.id %}" 
-                                           class="btn btn-sm btn-outline-success border-0 p-1" 
-                                           onclick="return confirm('¿Seguro que deseas REACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
-                                           title="Reactivar">
-                                            <i class="bi bi-x-circle-fill fs-5"></i>
-                                        </a>
+                                    {% if perms.appformulario.change_status_votante %}
+                                        <!-- Botón de CAMBIAR ESTADO -->
+                                        {% if v.status == "ACTIVE" %}
+                                            <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                            class="btn btn-sm btn-outline-secondary border-0 p-1"
+                                            onclick="return confirm('¿Seguro que deseas INACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
+                                            title="Inactivar">
+                                                <i class="bi bi-x-circle-fill fs-5"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                            class="btn btn-sm btn-outline-success border-0 p-1" 
+                                            onclick="return confirm('¿Seguro que deseas REACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
+                                            title="Reactivar">
+                                                <i class="bi bi-check-circle-fill fs-5"></i>
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                     
                                     {% if perms.appformulario.delete_votante %}

@@ -50,19 +50,19 @@ class votante(models.Model):
         help_text="Seleccione el líder responsable del votante."
     )
 
+    puesto_votacion = models.ForeignKey(
+        PuestoVotacion,
+        on_delete=models.PROTECT,
+        verbose_name="Puesto de Votación",
+        help_text="Seleccione el puesto de votación."
+    )
+
     mesa = models.ForeignKey(
         Mesa,
         on_delete=models.PROTECT,                
         verbose_name="Mesa de Votación",
         help_text="Seleccione."
     )
-
-    municipio_nacimiento = models.ForeignKey(
-        Municipio,
-        on_delete=models.PROTECT,
-        verbose_name="Lugar de nacimiento.",
-        help_text="Seleccione el lugar de nacimiento."
-    ) 
 
     status = models.CharField(
         max_length=8, 
@@ -76,5 +76,8 @@ class votante(models.Model):
         return f"{self.nombre} {self.apellido} - {self.mesa.numero}"
 
     class Meta:
+        permissions = [
+            ("change_status_votante", "Puede activar/inactivar votantes"),
+        ]
         verbose_name = "votante"
         verbose_name_plural = "votantes"

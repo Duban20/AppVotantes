@@ -6,8 +6,12 @@ from django.contrib import messages
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.db.models import Q
+
+from applider.models import Lider
 from .forms import VotanteForm
 from .models import votante
+from django.http import JsonResponse
+from appmesa.models import Mesa
 from io import BytesIO
 import pandas as pd
 
@@ -31,7 +35,6 @@ def lista_votantes(request):
             Q(nombre__icontains=query) |
             Q(apellido__icontains=query) |
             Q(cedula__icontains=query) |
-            Q(municipio_nacimiento__nombre__icontains=query) |
             Q(puesto_votacion__nombre_lugar__icontains=query)
         )
     
@@ -51,14 +54,11 @@ def crear_votante(request):
             form.save()
             messages.success(request, "✅ El votante fue registrado exitosamente.")
             return redirect('lista_votantes')
-        else:
-            messages.error(request, "❌ Hubo un error al registrar el votante. Verifique los datos.")
     else:
         form = VotanteForm()
 
     return render(request, 'votantes/form.html', {'form': form, 'titulo': 'Registrar Votante'})
 
-from django.contrib import messages
 
 @login_required
 @permission_required('appformulario.change_votante', raise_exception=True)
@@ -70,8 +70,6 @@ def editar_votante(request, pk):
             form.save()
             messages.success(request, "✅ Los datos del votante fueron actualizados correctamente.")
             return redirect('lista_votantes')
-        else:
-            messages.error(request, "❌ No se pudo actualizar el votante. Revise la información ingresada.")
     else:
         form = VotanteForm(instance=vot)
 
@@ -90,6 +88,7 @@ def eliminar_votante(request, pk):
     return redirect('lista_votantes')
 
 @login_required
+@permission_required('appformulario.change_status_votante', raise_exception=True)
 def cambiar_estado_votante(request, pk):
     vot = get_object_or_404(votante, pk=pk)
     
@@ -105,10 +104,46 @@ def cambiar_estado_votante(request, pk):
     # Redirige a la página de lista, conservando los filtros si es posible
     return redirect(request.META.get('HTTP_REFERER', 'lista_votantes'))
 
+@login_required
+def obtener_mesas_por_puesto(request):
+    puesto_id = request.GET.get("puesto_id")
+    mesas = Mesa.objects.filter(puesto_votacion_id=puesto_id, status="ACTIVE")
+
+    data = [
+        {"id": m.id, "numero": m.numero}
+        for m in mesas
+    ]
+    return JsonResponse({"mesas": data})
+
+@login_required
+def ajax_nuevo_lider(request):
+    if request.method == "POST":
+
+        nombre = request.POST.get("nombre")
+        cedula = request.POST.get("cedula")
+        telefono = request.POST.get("telefono")
+
+        lider = Lider.objects.create(
+            nombre=nombre,
+            cedula=cedula,
+            telefono=telefono
+        )
+
+        return JsonResponse({
+            "id": lider.id,
+            "nombre": lider.nombre,
+            "cedula": lider.cedula,
+            "telefono": lider.telefono
+        })
+
+    return JsonResponse({"error": "Método no permitido"}, status=400)
+
+
 
 
 # -----------------------------------------------------------------------
 # Función para exportar a Excel
+@login_required
 def exportar_votantes_excel(request):
 
     # Obtener solo votantes activos
@@ -116,7 +151,6 @@ def exportar_votantes_excel(request):
         'mesa',
         'mesa__puesto_votacion',
         'mesa__puesto_votacion__municipio',
-        'municipio_nacimiento',
         'lider'
     )
 
@@ -137,7 +171,6 @@ def exportar_votantes_excel(request):
             'Dirección de residencia': v.direccion_residencia,
             'Teléfono': v.telefono,
             'Líder': v.lider.nombre if v.lider else '',
-            'Municipio de Nacimiento': v.municipio_nacimiento.nombre if v.municipio_nacimiento else '',
             'Lugar de Votación': nombre_puesto,
             'Municipio del Puesto': municipio_puesto,
             'Dirección del Puesto': direccion_puesto,

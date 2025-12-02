@@ -4,7 +4,8 @@
 {% block content %}
 
 <div class="row justify-content-center">
-    <div class="col-lg-8"> <div class="card border-0 shadow-sm">
+    <div class="col-lg-8"> 
+        <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
 
                 <div class="text-center mb-5">
@@ -18,36 +19,157 @@
 
                 <form method="post">
                     {% csrf_token %}
-                    
+
+                    <!-- ============================= -->
+                    <!--   SECCIÓN 1: DATOS PERSONALES -->
+                    <!-- ============================= -->
+                    <h5 class="fw-bold mb-3 text-primary">Datos Personales</h5>
+
                     <div class="row">
-                        {% for field in form %}
                         <div class="mb-4 col-md-6">
-                            
-                            <!-- Label -->
-                            <label class="form-label small fw-bold text-secondary text-uppercase">
-                                {{ field.label }}
-                            </label>
-                            
-                            <!-- Input -->
-                            <div class="input-group">
-                                {{ field }}
-                            </div>
-
-                            <!-- Help Text -->
-                            <div class="form-text mt-2 small text-muted d-flex align-items-start">
-                                <i class="bi bi-info-circle me-1"></i>
-                                <span>{{ field.help_text }}</span>
-                            </div>
-
-                            <!-- Errors -->
-                            {% for error in field.errors %}
-                                <div class="text-danger small mt-1 fw-medium">
-                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error }}
-                                </div>
-                            {% endfor %}
-
+                            <label class="form-label small fw-bold text-secondary">Nombres</label>
+                            {{ form.nombre }}
                         </div>
-                        {% endfor %}
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Apellidos</label>
+                            {{ form.apellido }}
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Cédula</label>
+                            {{ form.cedula }}
+                            {% if form.cedula.errors %}
+                                <div class="text-danger small">
+                                    {{ form.cedula.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Dirección</label>
+                            {{ form.direccion_residencia }}
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- ============================= -->
+                    <!--       SECCIÓN 2: LÍDER        -->
+                    <!-- ============================= -->
+                    <h5 class="fw-bold mb-3 text-primary">Líder</h5>
+
+                    <div class="row">
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Seleccione el líder</label>
+
+                            <div class="input-group">
+                                <select id="id_lider" name="lider" class="form-select">
+                                    <option value="">Seleccione un líder</option>
+
+                                    {% with selected=form.lider.value %}
+                                        {% for lider in form.fields.lider.queryset %}
+                                            <option 
+                                                value="{{ lider.id }}"
+                                                data-cedula="{{ lider.cedula }}"
+                                                data-telefono="{{ lider.telefono }}"
+                                                {% if selected|stringformat:"s" == lider.id|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ lider.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    {% endwith %}
+                                </select>
+
+                                <!-- BOTÓN + -->
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoLider">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+
+                            {% if form.lider.errors %}
+                                <div class="text-danger small mt-1">{{ form.lider.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Datos auto-rellenados -->
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Cédula del líder</label>
+                            <input id="cedula_lider" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Teléfono del líder</label>
+                            <input id="telefono_lider" class="form-control" readonly>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- ============================= -->
+                    <!--   SECCIÓN 3: PUESTO VOTACIÓN  -->
+                    <!-- ============================= -->
+                    <h5 class="fw-bold mb-3 text-primary">Puesto de Votación</h5>
+
+                    <div class="row">
+
+                        <!-- Select puesto -->
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Puesto de votación</label>
+                            <select id="id_puesto_votacion" name="puesto_votacion" class="form-select">
+                                <option value="">Seleccione un puesto</option>
+
+                                {% for puesto in form.fields.puesto_votacion.queryset %}
+                                    <option 
+                                        value="{{ puesto.id }}"
+                                        data-direccion="{{ puesto.direccion }}"
+                                        data-municipio="{{ puesto.municipio.nombre }}"
+                                        data-departamento="{{ puesto.municipio.departamento.nombre }}"
+                                    >
+                                        {{ puesto.nombre_lugar }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            {% if form.puesto_votacion.errors %}
+                                <div class="text-danger small">{{ form.puesto_votacion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Select mesa (oculto al inicio) -->
+                        <div id="contenedor-mesa" class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Mesa</label>
+
+                            {{ form.mesa }}
+                            
+                            {% if form.mesa.errors %}
+                                <div class="text-danger small">{{ form.mesa.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Datos auto-rellenados -->
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Dirección</label>
+                            <input id="direccion_puesto" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Municipio</label>
+                            <input id="municipio" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Departamento</label>
+                            <input id="departamento" class="form-control" readonly>
+                        </div>
+
                     </div>
 
                     <!-- Buttons -->
@@ -55,7 +177,7 @@
                         <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">
                             Cancelar
                         </a>
-                        <button type="submit" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">
                             Guardar Datos
                         </button>
                     </div>
@@ -64,8 +186,185 @@
 
             </div>
         </div>
-
     </div>
 </div>
 
+<!-- MODAL PARA CREAR NUEVO LÍDER -->
+<div class="modal fade" id="modalNuevoLider" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Nuevo Líder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="formNuevoLider">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="lider_nombre" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cédula</label>
+                        <input type="number" id="lider_cedula" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="number" id="lider_telefono" class="form-control" required>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarLider">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT PARA AUTORRELLENAR DATOS DEL LÍDER -->
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("id_lider");
+    const cedulaInput = document.getElementById("cedula_lider");
+    const telefonoInput = document.getElementById("telefono_lider");
+
+    function fillLiderFields() {
+        const opt = select.options[select.selectedIndex];
+        if (opt && opt.value) {
+            cedulaInput.value = opt.dataset.cedula || "";
+            telefonoInput.value = opt.dataset.telefono || "";
+        } else {
+            cedulaInput.value = "";
+            telefonoInput.value = "";
+        }
+    }
+
+    // Ejecutar al cambiar
+    select.addEventListener("change", fillLiderFields);
+
+    // Ejecutar al cargar (restaurar valores si el form vino con datos)
+    fillLiderFields();
+});
+</script> -->
+
+<!-- AUTORRELLENAR DATOS DEL LIDER -->
+ <script>
+document.getElementById("id_lider").addEventListener("change", function () {
+    const option = this.options[this.selectedIndex];
+
+    document.getElementById("cedula_lider").value = option.dataset.cedula || "";
+    document.getElementById("telefono_lider").value = option.dataset.telefono || "";
+});
+</script>
+
+<!-- AJAX PARA CREAR NUEVO LÍDER -->
+<script>
+document.getElementById("btnGuardarLider").addEventListener("click", function () {
+
+    const formData = new FormData();
+    formData.append("csrfmiddlewaretoken", document.querySelector("[name='csrfmiddlewaretoken']").value);
+    formData.append("nombre", document.getElementById("lider_nombre").value);
+    formData.append("cedula", document.getElementById("lider_cedula").value);
+    formData.append("telefono", document.getElementById("lider_telefono").value);
+
+    fetch("{% url 'ajax_nuevo_lider' %}", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        // Agregar líder al select
+        const option = document.createElement("option");
+        option.value = data.id;
+        option.textContent = data.nombre;
+        option.dataset.cedula = data.cedula;
+        option.dataset.telefono = data.telefono;
+
+        const select = document.getElementById("id_lider");
+        select.appendChild(option);
+
+        // Seleccionar automáticamente
+        select.value = data.id;
+
+        // Autorrellenar datos
+        document.getElementById("cedula_lider").value = data.cedula;
+        document.getElementById("telefono_lider").value = data.telefono;
+
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalNuevoLider"));
+        modal.hide();
+
+        // Limpiar formulario
+        document.getElementById("lider_nombre").value = "";
+        document.getElementById("lider_cedula").value = "";
+        document.getElementById("lider_telefono").value = "";
+
+    });
+});
+</script>
+
+<!-- JAVASCRIPT PARA CARGAR MESAS SEGÚN EL PUESTO -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const selectPuesto = document.getElementById("id_puesto_votacion");
+    const selectMesa   = document.getElementById("id_mesa");
+
+    selectPuesto.addEventListener("change", function () {
+
+        const puestoId = this.value;
+
+        if (!puestoId) {
+            selectMesa.innerHTML = "<option>Seleccione un puesto primero</option>";
+            selectMesa.disabled = true;
+            return;
+        }
+
+        // Cargar mesas vía AJAX
+        fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            selectMesa.innerHTML = "";
+            selectMesa.disabled = false;
+
+            // // opción inicial vacía
+            // selectMesa.innerHTML = `<option value="">Seleccione una mesa</option>`;
+            // selectMesa.disabled = false;
+            
+            data.mesas.forEach(m => {
+                selectMesa.innerHTML += `<option value="${m.id}">Mesa ${m.numero}</option>`;
+            });
+        });
+
+    });
+
+});
+</script>
+
+<!-- AUTORRELLENAR DATOS DEL PUESTO -->
+ <script>
+document.getElementById("id_puesto_votacion").addEventListener("change", function () {
+
+    const option = this.options[this.selectedIndex];
+
+    document.getElementById("direccion_puesto").value = option.dataset.direccion || "";
+    document.getElementById("municipio").value        = option.dataset.municipio || "";
+    document.getElementById("departamento").value     = option.dataset.departamento || "";
+});
+</script>
+
 {% endblock %}
+

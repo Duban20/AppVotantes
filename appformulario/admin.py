@@ -11,7 +11,6 @@ class VotanteAdmin(admin.ModelAdmin):
     'puesto_direccion',
     'puesto_nombre',
     'municipio_y_departamento_puesto',
-    'municipio_y_departamento_nacimiento',
 )
 
 
@@ -23,12 +22,11 @@ class VotanteAdmin(admin.ModelAdmin):
     )
     ordering = ('apellido', 'nombre')
 
-    autocomplete_fields = ('mesa', 'municipio_nacimiento', 'lider')
+    autocomplete_fields = ('mesa', 'lider')
 
     fieldsets = (
         ('Información Personal', {
-            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'telefono', 
-                       'municipio_nacimiento')
+            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'telefono')
         }),
         ('Datos Electorales', {
             'fields': ('lider', 'mesa',)
@@ -85,20 +83,6 @@ class VotanteAdmin(admin.ModelAdmin):
             return '—'
     municipio_y_departamento_puesto.short_description = 'Mun. – Departamento (Puesto)'
     municipio_y_departamento_puesto.admin_order_field = 'mesa__puesto_votacion__municipio__nombre'
-
-    # MUNICIPIO & DEPARTAMENTO DE NACIMIENTO (juntos)
-    def municipio_y_departamento_nacimiento(self, obj):
-        try:
-            municipio = obj.municipio_nacimiento
-            if municipio:
-                depto = municipio.departamento.nombre if municipio.departamento else ''
-                return f"{municipio.nombre} – {depto}" if depto else municipio.nombre
-            return '—'
-        except Exception:
-            return '—'
-    municipio_y_departamento_nacimiento.short_description = 'Mun. – Departamento (Nacimiento)'
-    municipio_y_departamento_nacimiento.admin_order_field = 'municipio_nacimiento__nombre'
-
 
 # Registrar admin
 admin.site.register(votante, VotanteAdmin)
