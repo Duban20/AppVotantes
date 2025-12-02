@@ -22,6 +22,7 @@ class Lider(models.Model):
     telefono = models.CharField(
         max_length=12,
         verbose_name="Teléfono",
+        blank=True, null=True,
         help_text="Número de contacto del líder."
     )
 

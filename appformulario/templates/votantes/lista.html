@@ -85,13 +85,13 @@
             </div>
                 
                 <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-hover align-middle mb-0 text-nowrap">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light sticky-top">
                             <tr>
                                 <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0">Nombres</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Apellidos</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Cédula</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Edad</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
 
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Líder</th>
@@ -115,7 +115,7 @@
                                 <td class="ps-4">{{ v.nombre }}</td>
                                 <td>{{ v.apellido }}</td>
                                 <td class="text-muted font-monospace small">{{ v.cedula }}</td>
-                                <td>{{ v.edad }}</td>
+                                <td>{{ v.direccion_residencia|default:"—" }}</td>
                                 <td class="text-muted small">{{ v.telefono }}</td>
 
                                 <!-- LÍDER: solo nombre -->
@@ -159,7 +159,7 @@
                                 <!-- DIRECCIÓN DEL PUESTO -->
                                 <td>
                                     {% if v.mesa and v.mesa.puesto_votacion %}
-                                        {{ v.mesa.puesto_votacion.direccion }}
+                                        {{ v.mesa.puesto_votacion.direccion|default:"—" }}
                                     {% else %}
                                         —
                                     {% endif %}

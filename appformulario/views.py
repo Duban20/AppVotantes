@@ -123,8 +123,8 @@ def exportar_votantes_excel(request):
     data = []
     for v in votantes:
 
-        # Datos del puesto de votación (propiedad del modelo)
-        puesto = v.puesto_votacion  # esto viene de @property
+        # Datos del puesto de votación
+        puesto = v.mesa.puesto_votacion if v.mesa else None
 
         nombre_puesto = puesto.nombre_lugar if puesto else ''
         direccion_puesto = puesto.direccion if puesto else ''
@@ -134,7 +134,7 @@ def exportar_votantes_excel(request):
             'Nombres': v.nombre,
             'Apellidos': v.apellido,
             'Cédula': v.cedula,
-            'Edad': v.edad,
+            'Dirección de residencia': v.direccion_residencia,
             'Teléfono': v.telefono,
             'Líder': v.lider.nombre if v.lider else '',
             'Municipio de Nacimiento': v.municipio_nacimiento.nombre if v.municipio_nacimiento else '',

@@ -34,6 +34,4 @@ urlpatterns = [
 
     # Apps
     path('personas/', include('appformulario.urls')),
-    path('puestos/', include('AppPuestoVotacion.urls')),
-    path('municipios/', include('AppMunicipio.urls')),
 ]

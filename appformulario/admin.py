@@ -3,31 +3,17 @@ from .models import votante
 
 class VotanteAdmin(admin.ModelAdmin):
     list_display = (
-        'nombre',
-        'apellido',
-        'cedula',
-        'edad',
-        'telefono',
+    'nombre', 'apellido', 'cedula', 
+    'direccion_residencia',  
+    'telefono',
+    'lider_nombre',
+    'mesa_numero',
+    'puesto_direccion',
+    'puesto_nombre',
+    'municipio_y_departamento_puesto',
+    'municipio_y_departamento_nacimiento',
+)
 
-        # Líder (solo nombre)
-        'lider_nombre',
-
-        # Mesa (solo número)
-        'mesa_numero',
-
-        # Puesto: dirección y nombre
-        'puesto_direccion',
-        'puesto_nombre',
-
-        # Municipio y departamento del puesto (juntos)
-        'municipio_y_departamento_puesto',
-
-        # Municipio y departamento de nacimiento del votante (juntos)
-        'municipio_y_departamento_nacimiento',
-
-        # Estado (mantenerlo al final)
-        'status',
-    )
 
     # Filtros y búsqueda útiles
     list_filter = ('status', 'lider', 'mesa__puesto_votacion__municipio__departamento')
@@ -37,15 +23,15 @@ class VotanteAdmin(admin.ModelAdmin):
     )
     ordering = ('apellido', 'nombre')
 
+    autocomplete_fields = ('mesa', 'municipio_nacimiento', 'lider')
+
     fieldsets = (
         ('Información Personal', {
-            'fields': ('nombre', 'apellido', 'cedula', 'edad', 'telefono')
+            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'telefono', 
+                       'municipio_nacimiento')
         }),
         ('Datos Electorales', {
-            'fields': ('mesa', 'lider', 'municipio_nacimiento')
-        }),
-        ('Estado del Registro', {
-            'fields': ('status',)
+            'fields': ('lider', 'mesa',)
         }),
     )
 

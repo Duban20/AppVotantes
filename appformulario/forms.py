@@ -22,7 +22,7 @@ class VotanteForm(forms.ModelForm):
     class Meta:
         model = votante
         fields = [
-            'nombre', 'apellido', 'cedula', 'edad', 'telefono',
+            'nombre', 'apellido', 'cedula', 'direccion_residencia', 'telefono',
             'mesa', 'lider', 'municipio_nacimiento'
         ]
 
@@ -30,7 +30,7 @@ class VotanteForm(forms.ModelForm):
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'apellido': forms.TextInput(attrs={'class': 'form-control'}),
             'cedula': forms.TextInput(attrs={'class': 'form-control'}),
-            'edad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'direccion_residencia': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'mesa': forms.Select(attrs={'class': 'form-select'}),
             'lider': forms.Select(attrs={'class': 'form-select'}), 

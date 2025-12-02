@@ -3,7 +3,7 @@ from django.contrib import admin
 from applider.models import Lider
 
 class LiderAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'cedula', 'telefono', 'status')
+    list_display = ('nombre', 'cedula', 'telefono')
     list_filter = ('status',)
     search_fields = ('nombre', 'cedula')
     ordering = ('nombre',)
@@ -11,9 +11,6 @@ class LiderAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Información del Líder', {
             'fields': ('nombre', 'cedula', 'telefono')
-        }),
-        ('Estado', {
-            'fields': ('status',)
         }),
     )
 
