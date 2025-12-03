@@ -177,11 +177,13 @@ def exportar_votantes_excel(request):
             'Barrio de residencia': v.barrio_residencia,
             'Teléfono': v.telefono,
             'Líder': v.lider.nombre if v.lider else '',
+            'Documento líder': v.lider.cedula,
+            'Teléfono líder': v.lider.telefono,
             'Lugar de Votación': nombre_puesto,
+            'Mesa': v.mesa.numero,
             'Dirección': direccion_puesto,
             'Municipio': municipio_puesto,
             'Departamento': departamento_puesto,
-            'Mesa': v.mesa.numero,
         })
 
     # Crear DataFrame

@@ -93,7 +93,7 @@
                                 </select>
 
                                 <!-- BOTÓN + -->
-                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoLider">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoLider">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
@@ -131,16 +131,19 @@
                             <select id="id_puesto_votacion" name="puesto_votacion" class="form-select">
                                 <option value="">Seleccione un puesto</option>
 
-                                {% for puesto in form.fields.puesto_votacion.queryset %}
-                                    <option 
-                                        value="{{ puesto.id }}"
-                                        data-direccion="{{ puesto.direccion }}"
-                                        data-municipio="{{ puesto.municipio.nombre }}"
-                                        data-departamento="{{ puesto.municipio.departamento.nombre }}"
-                                    >
-                                        {{ puesto.nombre_lugar }}
-                                    </option>
-                                {% endfor %}
+                                {% with selected=form.puesto_votacion.value %}
+                                    {% for puesto in form.fields.puesto_votacion.queryset %}
+                                        <option
+                                            value="{{ puesto.id }}"
+                                            data-direccion="{{ puesto.direccion }}"
+                                            data-municipio="{{ puesto.municipio.nombre }}"
+                                            data-departamento="{{ puesto.municipio.departamento.nombre }}"
+                                            {% if selected|stringformat:"s" == puesto.id|stringformat:"s" %}selected{% endif %}
+                                        >
+                                            {{ puesto.nombre_lugar }}
+                                        </option>
+                                    {% endfor %}
+                                {% endwith %}
                             </select>
 
                             {% if form.puesto_votacion.errors %}
@@ -148,7 +151,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Select mesa (oculto al inicio) -->
+                        <!-- Select mesa -->
                         <div id="contenedor-mesa" class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Mesa</label>
 
@@ -237,8 +240,18 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT PARA AUTORRELLENAR DATOS DEL LÍDER -->
-<!-- <script>
+<!-- AUTORRELLENAR DATOS DEL LIDER -->
+ <script>
+document.getElementById("id_lider").addEventListener("change", function () {
+    const option = this.options[this.selectedIndex];
+
+    document.getElementById("cedula_lider").value = option.dataset.cedula || "";
+    document.getElementById("telefono_lider").value = option.dataset.telefono || "";
+});
+</script>
+
+<!-- AUTORRELLENAR DATOS DEL LIDER AL EDITAR -->
+<script>
 document.addEventListener("DOMContentLoaded", function () {
     const select = document.getElementById("id_lider");
     const cedulaInput = document.getElementById("cedula_lider");
@@ -260,16 +273,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ejecutar al cargar (restaurar valores si el form vino con datos)
     fillLiderFields();
-});
-</script> -->
-
-<!-- AUTORRELLENAR DATOS DEL LIDER -->
- <script>
-document.getElementById("id_lider").addEventListener("change", function () {
-    const option = this.options[this.selectedIndex];
-
-    document.getElementById("cedula_lider").value = option.dataset.cedula || "";
-    document.getElementById("telefono_lider").value = option.dataset.telefono || "";
 });
 </script>
 
@@ -321,15 +324,16 @@ document.getElementById("btnGuardarLider").addEventListener("click", function ()
 </script>
 
 <!-- JAVASCRIPT PARA CARGAR MESAS SEGÚN EL PUESTO -->
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const selectPuesto = document.getElementById("id_puesto_votacion");
     const selectMesa   = document.getElementById("id_mesa");
 
-    selectPuesto.addEventListener("change", function () {
+    // Obtener la mesa seleccionada al cargar el formulario (si estamos editando)
+    const mesaSeleccionada = "{{ form.mesa.value|default:'' }}";
 
-        const puestoId = this.value;
+    function cargarMesas(puestoId) {
 
         if (!puestoId) {
             selectMesa.innerHTML = "<option>Seleccione un puesto primero</option>";
@@ -345,16 +349,93 @@ document.addEventListener("DOMContentLoaded", function () {
             selectMesa.innerHTML = "";
             selectMesa.disabled = false;
 
-            // // opción inicial vacía
-            // selectMesa.innerHTML = `<option value="">Seleccione una mesa</option>`;
-            // selectMesa.disabled = false;
-            
             data.mesas.forEach(m => {
-                selectMesa.innerHTML += `<option value="${m.id}">Mesa ${m.numero}</option>`;
+                const opt = document.createElement("option");
+                opt.value = m.id;
+                opt.textContent = "Mesa " + m.numero;
+
+                // Marcar mesa seleccionada al editar
+                if (mesaSeleccionada == m.id) {
+                    opt.selected = true;
+                }
+
+                selectMesa.appendChild(opt);
             });
         });
+    }
 
+    // Al cambiar puesto
+    selectPuesto.addEventListener("change", function () {
+        cargarMesas(this.value);
     });
+
+    // Al cargar la página (si estamos editando)
+    if (selectPuesto.value) {
+        cargarMesas(selectPuesto.value);
+    }
+
+});
+</script> -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const selectPuesto = document.getElementById("id_puesto_votacion");
+    const selectMesa   = document.getElementById("id_mesa");
+
+    // Obtener la mesa seleccionada al cargar el formulario (si estamos editando)
+    const mesaSeleccionada = "{{ form.mesa.value|default:'' }}";
+
+    // --- Función para cargar mesas ---
+    function cargarMesas(puestoId) {
+
+        if (!puestoId) {
+            // No hay puesto → deshabilitar select de mesa
+            selectMesa.innerHTML = "<option>Seleccione un puesto primero</option>";
+            selectMesa.disabled = true;
+            return;
+        }
+
+        // Cargar mesas vía AJAX
+        fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            selectMesa.innerHTML = "";
+            selectMesa.disabled = false; // Habilitar
+
+            // Añadir opción vacía para que no quede ninguna seleccionada por defecto
+            selectMesa.innerHTML = '<option value="">Seleccione una mesa</option>';
+
+            data.mesas.forEach(m => {
+                const opt = document.createElement("option");
+                opt.value = m.id;
+                opt.textContent = "Mesa " + m.numero;
+
+                // Marcar mesa seleccionada al editar
+                if (mesaSeleccionada == m.id) {
+                    opt.selected = true;
+                }
+
+                selectMesa.appendChild(opt);
+            });
+        });
+    }
+
+    // --- Evento al cambiar puesto ---
+    selectPuesto.addEventListener("change", function () {
+        cargarMesas(this.value);
+    });
+
+    // --- Al cargar la página ---
+    if (selectPuesto.value) {
+        // Si estamos editando, cargar mesas y habilitar
+        cargarMesas(selectPuesto.value);
+    } else {
+        // Si no hay puesto seleccionado → deshabilitar
+        selectMesa.innerHTML = "<option>Seleccione un puesto primero</option>";
+        selectMesa.disabled = true;
+    }
 
 });
 </script>
@@ -368,6 +449,19 @@ document.getElementById("id_puesto_votacion").addEventListener("change", functio
     document.getElementById("direccion_puesto").value = option.dataset.direccion || "";
     document.getElementById("municipio").value        = option.dataset.municipio || "";
     document.getElementById("departamento").value     = option.dataset.departamento || "";
+});
+</script>
+
+<!-- AUTORRELLENAR DATOS DEL PUESTO AL EDITAR -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const option = document.querySelector("#id_puesto_votacion option:checked");
+
+    if (option) {
+        document.getElementById("direccion_puesto").value = option.dataset.direccion || "";
+        document.getElementById("municipio").value        = option.dataset.municipio || "";
+        document.getElementById("departamento").value     = option.dataset.departamento || "";
+    }
 });
 </script>
 
