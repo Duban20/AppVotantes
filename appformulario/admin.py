@@ -9,6 +9,7 @@ class VotanteAdmin(admin.ModelAdmin):
     'lider_nombre',
     'mesa_numero',
     'puesto_direccion',
+    'barrio_residencia',
     'puesto_nombre',
     'municipio_y_departamento_puesto',
 )
@@ -26,7 +27,7 @@ class VotanteAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Información Personal', {
-            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'telefono')
+            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'barrio_residencia', 'telefono')
         }),
         ('Datos Electorales', {
             'fields': ('lider', 'mesa',)

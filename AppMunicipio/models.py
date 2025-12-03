@@ -34,4 +34,4 @@ class Municipio(models.Model):
         verbose_name_plural = "Municipios / Corregimientos"
 
     def __str__(self):
-        return f"{self.nombre} – {self.departamento}"
+        return self.nombre

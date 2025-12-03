@@ -32,9 +32,14 @@ class votante(models.Model):
     
     direccion_residencia = models.CharField(
         max_length=100,
-        blank=True, null=True,
         verbose_name="Dirección de residencia",
         help_text="Ingrese la dirección de residencia del votante."
+    )    
+
+    barrio_residencia = models.CharField(
+        max_length=100,
+        verbose_name="Barrio",
+        help_text="Barrio de residencia."
     )    
 
     telefono = models.CharField(

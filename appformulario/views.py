@@ -163,17 +163,24 @@ def exportar_votantes_excel(request):
         nombre_puesto = puesto.nombre_lugar if puesto else ''
         direccion_puesto = puesto.direccion if puesto else ''
         municipio_puesto = puesto.municipio.nombre if puesto and puesto.municipio else ''
+        departamento_puesto = (
+            puesto.municipio.departamento.nombre
+            if puesto and puesto.municipio and puesto.municipio.departamento
+            else ''
+        )
 
         data.append({
             'Nombres': v.nombre,
             'Apellidos': v.apellido,
             'Cédula': v.cedula,
             'Dirección de residencia': v.direccion_residencia,
+            'Barrio de residencia': v.barrio_residencia,
             'Teléfono': v.telefono,
             'Líder': v.lider.nombre if v.lider else '',
             'Lugar de Votación': nombre_puesto,
-            'Municipio del Puesto': municipio_puesto,
-            'Dirección del Puesto': direccion_puesto,
+            'Dirección': direccion_puesto,
+            'Municipio': municipio_puesto,
+            'Departamento': departamento_puesto,
             'Mesa': v.mesa.numero,
         })
 

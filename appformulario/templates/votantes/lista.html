@@ -92,12 +92,14 @@
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Apellidos</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Cédula</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección de residencia</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Barrio de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Teléfono</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Líder</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Mesa (N°)</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Puesto de votación</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio del puesto</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección del puesto</th>                              
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Dirección</th> 
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Municipio</th>                                    
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Departamento</th>                                    
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0">Estado</th>
                                 <th class="py-3 pe-4 text-end text-uppercase text-secondary small fw-bold border-0">Acciones</th>
                             </tr>
@@ -107,9 +109,10 @@
                             <tr>
                                 <td class="ps-4">{{ v.nombre }}</td>
                                 <td>{{ v.apellido }}</td>
-                                <td class="text-muted font-monospace small">{{ v.cedula }}</td>
-                                <td>{{ v.direccion_residencia|default:"—" }}</td>
-                                <td class="text-muted small">{{ v.telefono }}</td>
+                                <td class="font-monospace">{{ v.cedula }}</td>
+                                <td>{{ v.direccion_residencia}}</td>
+                                <td>{{ v.barrio_residencia}}</td>
+                                <td>{{ v.telefono }}</td>
 
                                 <!-- LÍDER: solo nombre -->
                                 <td>
@@ -138,21 +141,28 @@
                                     {% endif %}
                                 </td>
 
-                                <!-- MUNICIPIO – DEPARTAMENTO (PUESTO) -->
+                                <!-- DIRECCIÓN DEL PUESTO -->
                                 <td>
-                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio %}
-                                        {% with m=v.mesa.puesto_votacion.municipio %}
-                                            {{ m.nombre }}{% if m.departamento %} – {{ m.departamento.nombre }}{% endif %}
-                                        {% endwith %}
+                                    {% if v.mesa and v.mesa.puesto_votacion %}
+                                        {{ v.mesa.puesto_votacion.direccion|default:"—" }}
                                     {% else %}
                                         —
                                     {% endif %}
                                 </td>
 
-                                <!-- DIRECCIÓN DEL PUESTO -->
+                                <!-- MUNICIPIO DEL PUESTO -->
                                 <td>
-                                    {% if v.mesa and v.mesa.puesto_votacion %}
-                                        {{ v.mesa.puesto_votacion.direccion|default:"—" }}
+                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio %}
+                                        {{ v.mesa.puesto_votacion.municipio.nombre }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- DEPARTAMENTO -->
+                                <td>
+                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio and v.mesa.puesto_votacion.municipio.departamento %}
+                                        {{ v.mesa.puesto_votacion.municipio.departamento.nombre }}
                                     {% else %}
                                         —
                                     {% endif %}
