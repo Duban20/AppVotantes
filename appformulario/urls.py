@@ -17,5 +17,4 @@ urlpatterns = [
     path('estado/<int:pk>/', cambiar_estado_votante, name='cambiar_estado_votante'),
     path('exportar/', views.exportar_votantes_excel, name='exportar_votantes'),
     path("ajax/mesas/", obtener_mesas_por_puesto, name="ajax_mesas"),
-    path("ajax/nuevo-lider/", views.ajax_nuevo_lider, name="ajax_nuevo_lider"),
 ]

@@ -88,9 +88,11 @@
                     <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light sticky-top">
                             <tr>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Rol</th>
                                 <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0 text-center">Nombres</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Apellidos</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Cédula</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Municipio de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Dirección de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Barrio de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Teléfono</th>
@@ -109,27 +111,51 @@
                         <tbody class="border-top-0">
                             {% for v in votantes %}
                             <tr>
+                                <td class="text-center">
+                                    {% if v.rol == "LIDER_VOTANTE" %}
+                                        <span class="badge bg-primary text-white rounded-pill fw-normal">
+                                            {{ v.get_rol_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark rounded-pill fw-normal">
+                                            {{ v.get_rol_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
                                 <td class="ps-4 text-center">{{ v.nombre }}</td>
                                 <td class="text-center">{{ v.apellido }}</td>
                                 <td class="font-monospace text-center">{{ v.cedula }}</td>
-                                <td class="text-center">{{ v.direccion_residencia}}</td>
-                                <td class="text-center">{{ v.barrio_residencia}}</td>
-                                <td class="text-center">{{ v.telefono }}</td>
+                                <td class="text-center">{{ v.municipio_residencia|default:"—"}}</td>
+                                <td class="text-center">{{ v.direccion_residencia|default:"—"}}</td>
+                                <td class="text-center">{{ v.barrio_residencia|default:"—"}}</td>
+                                <td class="text-center">{{ v.telefono|default:"—" }}</td>
 
                                 <!-- NOMBRE DEL LIDER -->
                                 <td class="text-center">
-                                    {% if v.lider %}
-                                        {{ v.lider.nombre }}
+                                    {% if v.lider_asignado %}
+                                        {{ v.lider_asignado.nombre }} {{ v.lider_asignado.apellido }}
                                     {% else %}
                                         —
                                     {% endif %}
                                 </td>
 
                                 <!-- CÉDULA DEL LIDER -->
-                                <td class="font-monospace text-center">{{ v.lider.cedula }}</td>
+                                <td class="font-monospace text-center">
+                                    {% if v.lider_asignado %}
+                                        {{ v.lider_asignado.cedula }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
 
                                 <!-- TELÉFONO DEL LIDER -->
-                                <td class="font-monospace text-center">{{ v.lider.telefono }}</td>
+                                <td class="font-monospace text-center">
+                                    {% if v.lider_asignado %}
+                                        {{ v.lider_asignado.telefono }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
 
                                 <!-- NOMBRE DEL PUESTO -->
                                 <td class="text-center">

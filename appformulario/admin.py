@@ -1,89 +1,133 @@
 from django.contrib import admin
 from .models import votante
 
+
 class VotanteAdmin(admin.ModelAdmin):
+
+    # Columnas visibles en la tabla del admin
     list_display = (
-    'nombre', 'apellido', 'cedula', 
-    'direccion_residencia',  
-    'telefono',
-    'lider_nombre',
-    'mesa_numero',
-    'puesto_direccion',
-    'barrio_residencia',
-    'puesto_nombre',
-    'municipio_y_departamento_puesto',
-)
-
-
-    # Filtros y búsqueda útiles
-    list_filter = ('status', 'lider', 'mesa__puesto_votacion__municipio__departamento')
-    search_fields = (
-        'nombre', 'apellido', 'cedula', 'telefono',
-        'lider__nombre', 'mesa__numero', 'mesa__puesto_votacion__nombre_lugar'
+        'nombre',
+        'apellido',
+        'cedula',
+        'direccion_residencia',
+        'telefono',
+        'rol',
+        'lider_nombre',
+        'mesa_numero',
+        'puesto_direccion',
+        'barrio_residencia',
+        'puesto_nombre',
+        'municipio_y_departamento_puesto',
+        'status',
     )
+
+    # Filtros
+    list_filter = (
+        'status',
+        'rol',
+        'mesa__puesto_votacion__municipio__departamento',
+        'mesa',
+        'mesa__puesto_votacion',
+    )
+
+    # Campos de búsqueda
+    search_fields = (
+        'nombre',
+        'apellido',
+        'cedula',
+        'telefono',
+        'lider_asignado__nombre',
+        'lider_asignado__apellido',
+        'mesa__numero',
+        'mesa__puesto_votacion__nombre_lugar',
+    )
+
     ordering = ('apellido', 'nombre')
 
-    autocomplete_fields = ('mesa', 'lider')
+    # Autocomplete
+    autocomplete_fields = ('mesa', 'lider_asignado')
 
+    # Fieldsets organizados
     fieldsets = (
         ('Información Personal', {
-            'fields': ('nombre', 'apellido', 'cedula', 'direccion_residencia', 'barrio_residencia', 'telefono')
+            'fields': (
+                'rol',
+                'nombre',
+                'apellido',
+                'cedula',
+                'municipio_residencia',
+                'direccion_residencia',
+                'barrio_residencia',
+                'telefono',
+            )
         }),
+
         ('Datos Electorales', {
-            'fields': ('lider', 'mesa',)
+            'fields': (
+                'lider_asignado',
+                'puesto_votacion',
+                'mesa',
+                'status',
+            )
         }),
     )
 
-    # -----------------------
-    # MÉTODOS PARA CADA COLUMNA
-    # -----------------------
+    # ---------------------------------------------------
+    # MÉTODOS PERSONALIZADOS PARA COLUMNAS DEL ADMIN
+    # ---------------------------------------------------
 
-    # LÍDER: solo nombre
     def lider_nombre(self, obj):
-        return obj.lider.nombre if getattr(obj, 'lider', None) else '—'
-    lider_nombre.short_description = 'Líder'
-    lider_nombre.admin_order_field = 'lider__nombre'
+        """Devuelve el nombre del líder asignado."""
+        if obj.lider_asignado:
+            return f"{obj.lider_asignado.nombre} {obj.lider_asignado.apellido}"
+        return "—"
+    lider_nombre.short_description = "Líder"
+    lider_nombre.admin_order_field = "lider_asignado__nombre"
 
-    # MESA: solo número
     def mesa_numero(self, obj):
-        return obj.mesa.numero if getattr(obj, 'mesa', None) else '—'
-    mesa_numero.short_description = 'Mesa'
-    mesa_numero.admin_order_field = 'mesa__numero'
+        """Número de mesa."""
+        return obj.mesa.numero if obj.mesa else "—"
+    mesa_numero.short_description = "Mesa"
+    mesa_numero.admin_order_field = "mesa__numero"
 
-    # PUESTO: dirección
     def puesto_direccion(self, obj):
+        """Dirección del puesto de votación."""
         try:
             pv = obj.mesa.puesto_votacion
-            # Si en tu modelo guardas "N/A" cuando no aplica, se mostrará eso
-            return pv.direccion if pv else '—'
-        except Exception:
-            return '—'
-    puesto_direccion.short_description = 'Dirección Puesto'
-    puesto_direccion.admin_order_field = 'mesa__puesto_votacion__direccion'
+            return pv.direccion if pv else "—"
+        except:
+            return "—"
+    puesto_direccion.short_description = "Dirección Puesto"
+    puesto_direccion.admin_order_field = "mesa__puesto_votacion__direccion"
 
-    # PUESTO: nombre del puesto
     def puesto_nombre(self, obj):
+        """Nombre del puesto."""
         try:
             pv = obj.mesa.puesto_votacion
-            return pv.nombre_lugar if pv else '—'
-        except Exception:
-            return '—'
-    puesto_nombre.short_description = 'Puesto'
-    puesto_nombre.admin_order_field = 'mesa__puesto_votacion__nombre_lugar'
+            return pv.nombre_lugar if pv else "—"
+        except:
+            return "—"
+    puesto_nombre.short_description = "Puesto"
+    puesto_nombre.admin_order_field = "mesa__puesto_votacion__nombre_lugar"
 
-    # MUNICIPIO & DEPARTAMENTO DEL PUESTO (juntos)
     def municipio_y_departamento_puesto(self, obj):
+        """Municipio y departamento del puesto."""
         try:
             municipio = obj.mesa.puesto_votacion.municipio
             if municipio:
-                # Usamos los campos explícitos para evitar depender únicamente de __str__
                 depto = municipio.departamento.nombre if municipio.departamento else ''
                 return f"{municipio.nombre} – {depto}" if depto else municipio.nombre
-            return '—'
-        except Exception:
-            return '—'
-    municipio_y_departamento_puesto.short_description = 'Mun. – Departamento (Puesto)'
-    municipio_y_departamento_puesto.admin_order_field = 'mesa__puesto_votacion__municipio__nombre'
+        except:
+            pass
+        return "—"
+    municipio_y_departamento_puesto.short_description = "Mun. – Departamento (Puesto)"
+    municipio_y_departamento_puesto.admin_order_field = "mesa__puesto_votacion__municipio__nombre"
+
+    # Filtro personalizado para puesto (porque no es FK directo)
+    def puesto_votacion_filtro(self, obj):
+        return obj.mesa.puesto_votacion.nombre_lugar if obj.mesa else "—"
+    puesto_votacion_filtro.short_description = "Puesto de Votación"
+
 
 # Registrar admin
 admin.site.register(votante, VotanteAdmin)

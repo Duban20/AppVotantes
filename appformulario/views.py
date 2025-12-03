@@ -7,7 +7,6 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.db.models import Q
 
-from applider.models import Lider
 from .forms import VotanteForm
 from .models import votante
 from django.http import JsonResponse
@@ -115,28 +114,6 @@ def obtener_mesas_por_puesto(request):
     ]
     return JsonResponse({"mesas": data})
 
-@login_required
-def ajax_nuevo_lider(request):
-    if request.method == "POST":
-
-        nombre = request.POST.get("nombre")
-        cedula = request.POST.get("cedula")
-        telefono = request.POST.get("telefono")
-
-        lider = Lider.objects.create(
-            nombre=nombre,
-            cedula=cedula,
-            telefono=telefono
-        )
-
-        return JsonResponse({
-            "id": lider.id,
-            "nombre": lider.nombre,
-            "cedula": lider.cedula,
-            "telefono": lider.telefono
-        })
-
-    return JsonResponse({"error": "Método no permitido"}, status=400)
 
 
 
@@ -146,51 +123,73 @@ def ajax_nuevo_lider(request):
 @login_required
 def exportar_votantes_excel(request):
 
+    # Función para sustituir vacíos por '-'
+    def safe(value):
+        return value if value not in [None, '', ' '] else '-'
+
     # Obtener solo votantes activos
     votantes = votante.objects.filter(status='ACTIVE').select_related(
+        'puesto_votacion',
         'mesa',
-        'mesa__puesto_votacion',
-        'mesa__puesto_votacion__municipio',
-        'lider'
+        'municipio_residencia',
+        'puesto_votacion__municipio__departamento',
+        'lider_asignado'
     )
 
     data = []
     for v in votantes:
 
-        # Datos del puesto de votación
-        puesto = v.mesa.puesto_votacion if v.mesa else None
+        puesto = v.puesto_votacion
 
-        nombre_puesto = puesto.nombre_lugar if puesto else ''
-        direccion_puesto = puesto.direccion if puesto else ''
-        municipio_puesto = puesto.municipio.nombre if puesto and puesto.municipio else ''
+        nombre_puesto = puesto.nombre_lugar if puesto else None
+        direccion_puesto = puesto.direccion if puesto else None
+        municipio_puesto = puesto.municipio.nombre if puesto and puesto.municipio else None
         departamento_puesto = (
             puesto.municipio.departamento.nombre
             if puesto and puesto.municipio and puesto.municipio.departamento
-            else ''
+            else None
         )
 
         data.append({
-            'Nombres': v.nombre,
-            'Apellidos': v.apellido,
-            'Cédula': v.cedula,
-            'Dirección de residencia': v.direccion_residencia,
-            'Barrio de residencia': v.barrio_residencia,
-            'Teléfono': v.telefono,
-            'Líder': v.lider.nombre if v.lider else '',
-            'Documento líder': v.lider.cedula,
-            'Teléfono líder': v.lider.telefono,
-            'Lugar de Votación': nombre_puesto,
-            'Mesa': v.mesa.numero,
-            'Dirección': direccion_puesto,
-            'Municipio': municipio_puesto,
-            'Departamento': departamento_puesto,
+            # ----- CAMPOS DEL MODELO -----
+            'Rol': safe(v.get_rol_display()),
+            'Nombres': safe(v.nombre),
+            'Apellidos': safe(v.apellido),
+            'Cédula': safe(v.cedula),
+
+            'Municipio de residencia': safe(
+                v.municipio_residencia.nombre if v.municipio_residencia else None
+            ),
+
+            'Dirección de residencia': safe(v.direccion_residencia),
+            'Barrio de residencia': safe(v.barrio_residencia),
+            'Teléfono': safe(v.telefono),
+
+            # ----- PUESTO -----
+            'Puesto de votación': safe(nombre_puesto),
+            'Dirección puesto': safe(direccion_puesto),
+            'Municipio puesto': safe(municipio_puesto),
+            'Departamento puesto': safe(departamento_puesto),
+
+            # Mesa
+            'Mesa': safe(v.mesa.numero if v.mesa else None),
+
+            # ----- LÍDER -----
+            'Líder asignado': safe(
+                f"{v.lider_asignado.nombre} {v.lider_asignado.apellido}"
+                if v.lider_asignado else None
+            ),
+            'Documento líder': safe(v.lider_asignado.cedula if v.lider_asignado else None),
+            'Teléfono líder': safe(v.lider_asignado.telefono if v.lider_asignado else None),
+
+            # Estado
+            'Estado': safe(v.get_status_display()),
         })
 
     # Crear DataFrame
     df = pd.DataFrame(data)
     buffer = BytesIO()
 
-    # Escribir Excel inicial
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Votantes')
 
@@ -198,16 +197,9 @@ def exportar_votantes_excel(request):
     wb = load_workbook(buffer)
     ws = wb.active
 
-    # Estilos
-    header_fill = PatternFill(start_color="404040", end_color="404040", fill_type="solid")
-    header_font = Font(bold=True, color="FFFFFF", size=11)
-    ws.freeze_panes = 'A2'
-
-    ws = wb.active
-
-    # -----------------------------------------
+    # -----------------------------------------------
     # ESTILOS
-    # -----------------------------------------
+    # -----------------------------------------------
     header_fill = PatternFill(start_color="404040", end_color="404040", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF", size=11)
 
@@ -220,38 +212,32 @@ def exportar_votantes_excel(request):
         bottom=Side(style='thin')
     )
 
-    # Congelar encabezado
     ws.freeze_panes = 'A2'
 
-    # -----------------------------------------
-    # ESTILAR ENCABEZADO
-    # -----------------------------------------
+    # ----- ENCABEZADOS -----
     for cell in ws[1]:
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal='center', wrap_text=True)
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
         cell.border = thin_border
 
-    # Activar auto-filtros
     ws.auto_filter.ref = ws.dimensions
 
-    # -----------------------------------------
-    # ZEBRA + BORDES + WRAP TEXT
-    # -----------------------------------------
+    # ----- FILAS -----
     for row_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
-        # Zebra: filas pares = gris suave
         if row_idx % 2 == 0:
             for cell in row:
                 cell.fill = zebra_fill
 
-        # Bordes y ajuste de texto para todas las celdas
         for cell in row:
             cell.border = thin_border
-            cell.alignment = Alignment(wrap_text=True, vertical='top')
+            cell.alignment = Alignment(
+                horizontal='center',
+                vertical='center',
+                wrap_text=True
+            )
 
-    # -----------------------------------------
-    # AUTO-ANCHO DE COLUMNAS (con límite)
-    # -----------------------------------------
+    # ----- AUTO-ANCHO -----
     for col in ws.columns:
         max_len = 0
         col_letter = col[0].column_letter
@@ -260,11 +246,8 @@ def exportar_votantes_excel(request):
             if cell.value:
                 max_len = max(max_len, len(str(cell.value)))
 
-        # Evita columnas gigantes (máximo 40 caracteres de ancho)
         max_len = min(max_len, 40)
-
         ws.column_dimensions[col_letter].width = max_len + 3
-
 
     # Exportar archivo
     output = BytesIO()
@@ -276,5 +259,4 @@ def exportar_votantes_excel(request):
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename=Listado_Votantes.xlsx'
-
     return response

@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'AppMunicipio.apps.AppMunicipioConfig',
     'AppPuestoVotacion.apps.AppPuestoVotacionConfig',
     'appmesa.apps.AppmesaConfig',
-    'applider.apps.AppliderConfig',
     'appformulario.apps.AppformularioConfig',
 ]
 

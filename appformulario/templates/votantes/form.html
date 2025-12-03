@@ -18,6 +18,17 @@
                 </div>
 
                 <form method="post">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Errores del formulario:</strong>
+                        <ul class="mt-2">
+                            {% for field, errors in form.errors.items %}
+                                <li><strong>{{ field }}:</strong> {{ errors.0 }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
                     {% csrf_token %}
 
                     <!-- ============================= -->
@@ -26,40 +37,79 @@
                     <h5 class="fw-bold mb-3 text-primary">Datos Personales</h5>
 
                     <div class="row">
+
+                        <!-- ROL -->
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Rol</label>
+                            {{ form.rol }}
+                            {% if form.rol.errors %}
+                                <div class="text-danger small">{{ form.rol.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- NOMBRES -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Nombres</label>
                             {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger small">{{ form.nombre.errors.0 }}</div>
+                            {% endif %}
                         </div>
 
+                        <!-- APELLIDOS -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Apellidos</label>
                             {{ form.apellido }}
+                            {% if form.apellido.errors %}
+                                <div class="text-danger small">{{ form.apellido.errors.0 }}</div>
+                            {% endif %}
                         </div>
 
+                        <!-- CÉDULA -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Cédula</label>
                             {{ form.cedula }}
                             {% if form.cedula.errors %}
-                                <div class="text-danger small">
-                                    {{ form.cedula.errors.0 }}
-                                </div>
+                                <div class="text-danger small">{{ form.cedula.errors.0 }}</div>
                             {% endif %}
                         </div>
 
+                        <!-- TELÉFONO -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Teléfono</label>
                             {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                                <div class="text-danger small">{{ form.telefono.errors.0 }}</div>
+                            {% endif %}
                         </div>
 
+                        <!-- DIRECCIÓN -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Dirección</label>
                             {{ form.direccion_residencia }}
+                            {% if form.direccion_residencia.errors %}
+                                <div class="text-danger small">{{ form.direccion_residencia.errors.0 }}</div>
+                            {% endif %}
                         </div>
-                        
+
+                        <!-- BARRIO -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Barrio</label>
                             {{ form.barrio_residencia }}
+                            {% if form.barrio_residencia.errors %}
+                                <div class="text-danger small">{{ form.barrio_residencia.errors.0 }}</div>
+                            {% endif %}
                         </div>
+
+                        <!-- MUNICIPIO DE RESIDENCIA -->
+                        <div class="mb-4 col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Municipio de residencia</label>
+                            {{ form.municipio_residencia }}
+                            {% if form.municipio_residencia.errors %}
+                                <div class="text-danger small">{{ form.municipio_residencia.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
                     </div>
 
                     <hr class="my-4">
@@ -75,31 +125,26 @@
                             <label class="form-label small fw-bold text-secondary">Seleccione el líder</label>
 
                             <div class="input-group">
-                                <select id="id_lider" name="lider" class="form-select">
+                                <select id="id_lider_asignado" name="lider_asignado" class="form-select">
                                     <option value="">Seleccione un líder</option>
 
-                                    {% with selected=form.lider.value %}
-                                        {% for lider in form.fields.lider.queryset %}
+                                    {% with selected=form.lider_asignado.value %}
+                                        {% for lider in form.fields.lider_asignado.queryset %}
                                             <option 
                                                 value="{{ lider.id }}"
                                                 data-cedula="{{ lider.cedula }}"
                                                 data-telefono="{{ lider.telefono }}"
                                                 {% if selected|stringformat:"s" == lider.id|stringformat:"s" %}selected{% endif %}
                                             >
-                                                {{ lider.nombre }}
+                                                {{ lider.nombre }} {{ lider.apellido }}
                                             </option>
                                         {% endfor %}
                                     {% endwith %}
                                 </select>
-
-                                <!-- BOTÓN + -->
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoLider">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
                             </div>
 
-                            {% if form.lider.errors %}
-                                <div class="text-danger small mt-1">{{ form.lider.errors.0 }}</div>
+                            {% if form.lider_asignado.errors %}
+                                <div class="text-danger small mt-1">{{ form.lider_asignado.errors.0 }}</div>
                             {% endif %}
                         </div>
 
@@ -125,7 +170,6 @@
 
                     <div class="row">
 
-                        <!-- Select puesto -->
                         <div class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Puesto de votación</label>
                             <select id="id_puesto_votacion" name="puesto_votacion" class="form-select">
@@ -151,12 +195,12 @@
                             {% endif %}
                         </div>
 
-                        <!-- Select mesa -->
+                        <!-- Mesa -->
                         <div id="contenedor-mesa" class="mb-4 col-md-6">
                             <label class="form-label small fw-bold text-secondary">Mesa</label>
 
                             {{ form.mesa }}
-                            
+
                             {% if form.mesa.errors %}
                                 <div class="text-danger small">{{ form.mesa.errors.0 }}</div>
                             {% endif %}
@@ -182,83 +226,27 @@
 
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
-                        <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">
-                            Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">
-                            Guardar Datos
-                        </button>
+                        <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">Guardar Datos</button>
                     </div>
 
                 </form>
+
 
             </div>
         </div>
     </div>
 </div>
 
-<!-- MODAL PARA CREAR NUEVO LÍDER -->
-<div class="modal fade" id="modalNuevoLider" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Registrar Nuevo Líder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <form id="formNuevoLider">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input type="text" id="lider_nombre" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Cédula</label>
-                        <input type="number" id="lider_cedula" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Teléfono</label>
-                        <input type="number" id="lider_telefono" class="form-control" required>
-                    </div>
-
-                </form>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary" id="btnGuardarLider">Guardar</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- AUTORRELLENAR DATOS DEL LIDER -->
- <script>
-document.getElementById("id_lider").addEventListener("change", function () {
-    const option = this.options[this.selectedIndex];
-
-    document.getElementById("cedula_lider").value = option.dataset.cedula || "";
-    document.getElementById("telefono_lider").value = option.dataset.telefono || "";
-});
-</script>
-
-<!-- AUTORRELLENAR DATOS DEL LIDER AL EDITAR -->
+<!-- AUTORRELLENAR DATOS DEL LIDER (unificado) -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const select = document.getElementById("id_lider");
+    const selectLider = document.getElementById("id_lider_asignado");
     const cedulaInput = document.getElementById("cedula_lider");
     const telefonoInput = document.getElementById("telefono_lider");
 
     function fillLiderFields() {
-        const opt = select.options[select.selectedIndex];
+        const opt = selectLider.options[selectLider.selectedIndex];
         if (opt && opt.value) {
             cedulaInput.value = opt.dataset.cedula || "";
             telefonoInput.value = opt.dataset.telefono || "";
@@ -268,115 +256,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Ejecutar al cambiar
-    select.addEventListener("change", fillLiderFields);
-
-    // Ejecutar al cargar (restaurar valores si el form vino con datos)
-    fillLiderFields();
-});
-</script>
-
-<!-- AJAX PARA CREAR NUEVO LÍDER -->
-<script>
-document.getElementById("btnGuardarLider").addEventListener("click", function () {
-
-    const formData = new FormData();
-    formData.append("csrfmiddlewaretoken", document.querySelector("[name='csrfmiddlewaretoken']").value);
-    formData.append("nombre", document.getElementById("lider_nombre").value);
-    formData.append("cedula", document.getElementById("lider_cedula").value);
-    formData.append("telefono", document.getElementById("lider_telefono").value);
-
-    fetch("{% url 'ajax_nuevo_lider' %}", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        // Agregar líder al select
-        const option = document.createElement("option");
-        option.value = data.id;
-        option.textContent = data.nombre;
-        option.dataset.cedula = data.cedula;
-        option.dataset.telefono = data.telefono;
-
-        const select = document.getElementById("id_lider");
-        select.appendChild(option);
-
-        // Seleccionar automáticamente
-        select.value = data.id;
-
-        // Autorrellenar datos
-        document.getElementById("cedula_lider").value = data.cedula;
-        document.getElementById("telefono_lider").value = data.telefono;
-
-        // Cerrar modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById("modalNuevoLider"));
-        modal.hide();
-
-        // Limpiar formulario
-        document.getElementById("lider_nombre").value = "";
-        document.getElementById("lider_cedula").value = "";
-        document.getElementById("lider_telefono").value = "";
-
-    });
+    if (selectLider) {
+        selectLider.addEventListener("change", fillLiderFields);
+        // Rellenar al cargar en caso de edición
+        fillLiderFields();
+    }
 });
 </script>
 
 <!-- JAVASCRIPT PARA CARGAR MESAS SEGÚN EL PUESTO -->
-<!-- <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const selectPuesto = document.getElementById("id_puesto_votacion");
-    const selectMesa   = document.getElementById("id_mesa");
-
-    // Obtener la mesa seleccionada al cargar el formulario (si estamos editando)
-    const mesaSeleccionada = "{{ form.mesa.value|default:'' }}";
-
-    function cargarMesas(puestoId) {
-
-        if (!puestoId) {
-            selectMesa.innerHTML = "<option>Seleccione un puesto primero</option>";
-            selectMesa.disabled = true;
-            return;
-        }
-
-        // Cargar mesas vía AJAX
-        fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
-        .then(response => response.json())
-        .then(data => {
-
-            selectMesa.innerHTML = "";
-            selectMesa.disabled = false;
-
-            data.mesas.forEach(m => {
-                const opt = document.createElement("option");
-                opt.value = m.id;
-                opt.textContent = "Mesa " + m.numero;
-
-                // Marcar mesa seleccionada al editar
-                if (mesaSeleccionada == m.id) {
-                    opt.selected = true;
-                }
-
-                selectMesa.appendChild(opt);
-            });
-        });
-    }
-
-    // Al cambiar puesto
-    selectPuesto.addEventListener("change", function () {
-        cargarMesas(this.value);
-    });
-
-    // Al cargar la página (si estamos editando)
-    if (selectPuesto.value) {
-        cargarMesas(selectPuesto.value);
-    }
-
-});
-</script> -->
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -441,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <!-- AUTORRELLENAR DATOS DEL PUESTO -->
- <script>
+<script>
 document.getElementById("id_puesto_votacion").addEventListener("change", function () {
 
     const option = this.options[this.selectedIndex];
@@ -465,5 +353,76 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-{% endblock %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const leaderSelect = document.getElementById("id_lider_asignado"); // select de líderes
+    const roleSelect   = document.getElementById("id_rol");          // select normal (si existe)
+    const roleRadios   = document.querySelectorAll('input[name="rol"]'); // radioselect (si aplica)
 
+    if (!leaderSelect) return; // si no existe, nada que hacer
+
+    // Crear (o reutilizar) el contenedor del mensaje informativo
+    let infoMsg = document.getElementById("lider-info-msg");
+    if (!infoMsg) {
+        infoMsg = document.createElement("div");
+        infoMsg.id = "lider-info-msg";
+        // Usamos una alerta pequeña de bootstrap y aria-live para accesibilidad
+        infoMsg.className = "alert alert-info small py-1 mt-2";
+        infoMsg.setAttribute("role", "status");
+        infoMsg.setAttribute("aria-live", "polite");
+        // Texto por defecto (se reemplaza dinámicamente)
+        infoMsg.textContent = "";
+        // Insertar después del select de líder (si hay un contenedor padre adecuado)
+        leaderSelect.parentNode.insertBefore(infoMsg, leaderSelect.nextSibling);
+    }
+
+    function isRoleLeader(value) {
+        if (!value) return false;
+        return value.toString().toUpperCase().includes("LIDER");
+    }
+
+    function toggleLeaderSelect(isLeader) {
+        if (isLeader) {
+            // Deshabilitar y limpiar selección
+            leaderSelect.disabled = true;
+            leaderSelect.value = "";
+            leaderSelect.selectedIndex = 0; // mostrar la opción por defecto
+
+            // Mostrar mensaje informativo
+            infoMsg.textContent = "Al seleccionar el rol «Líder», este votante no puede tener un líder asignado. El campo se ha deshabilitado automáticamente.";
+            infoMsg.style.display = "block";
+            leaderSelect.setAttribute("aria-disabled", "true");
+            leaderSelect.classList.add("disabled");
+        } else {
+            // Habilitar y ocultar mensaje
+            leaderSelect.disabled = false;
+            infoMsg.style.display = "none";
+            leaderSelect.removeAttribute("aria-disabled");
+            leaderSelect.classList.remove("disabled");
+        }
+    }
+
+    // Inicializar según el estado actual (caso edición)
+    if (roleSelect) {
+        toggleLeaderSelect(isRoleLeader(roleSelect.value));
+        roleSelect.addEventListener("change", function () {
+            toggleLeaderSelect(isRoleLeader(this.value));
+        });
+    }
+
+    if (roleRadios && roleRadios.length) {
+        // Ver cuál está marcado al cargar
+        const checked = Array.from(roleRadios).find(r => r.checked);
+        toggleLeaderSelect(isRoleLeader(checked ? checked.value : ""));
+
+        roleRadios.forEach(radio => {
+            radio.addEventListener("change", function () {
+                toggleLeaderSelect(isRoleLeader(this.value));
+            });
+        });
+    }
+});
+</script>
+
+
+{% endblock %}
