@@ -13,6 +13,8 @@ class VotanteAdmin(admin.ModelAdmin):
         'telefono',
         'rol',
         'lider_nombre',
+        'lider_cedula',
+        'lider_telefono',
         'mesa_numero',
         'puesto_direccion',
         'barrio_residencia',
@@ -83,6 +85,14 @@ class VotanteAdmin(admin.ModelAdmin):
         return "—"
     lider_nombre.short_description = "Líder"
     lider_nombre.admin_order_field = "lider_asignado__nombre"
+
+    def lider_cedula(self, obj):
+        return obj.lider_asignado.cedula if obj.lider_asignado else "—"
+    lider_cedula.short_description = "Cédula Líder"
+
+    def lider_telefono(self, obj):
+        return obj.lider_asignado.telefono if obj.lider_asignado else "—"
+    lider_telefono.short_description = "Teléfono Líder"
 
     def mesa_numero(self, obj):
         """Número de mesa."""

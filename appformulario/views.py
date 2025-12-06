@@ -179,8 +179,8 @@ def exportar_votantes_excel(request):
                 f"{v.lider_asignado.nombre} {v.lider_asignado.apellido}"
                 if v.lider_asignado else None
             ),
-            'Documento líder': safe(v.lider_asignado.cedula if v.lider_asignado else None),
-            'Teléfono líder': safe(v.lider_asignado.telefono if v.lider_asignado else None),
+            # 'Documento líder': safe(v.lider_asignado.cedula if v.lider_asignado else None),
+            # 'Teléfono líder': safe(v.lider_asignado.telefono if v.lider_asignado else None),
 
             # Estado
             'Estado': safe(v.get_status_display()),
