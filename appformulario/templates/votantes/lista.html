@@ -97,8 +97,6 @@
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Barrio de residencia</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Teléfono</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Líder</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Documento líder</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Teléfono líder</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Puesto de votación</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Mesa (N°)</th>
                                 <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Dirección</th> 
@@ -134,24 +132,6 @@
                                 <td class="text-center">
                                     {% if v.lider_asignado %}
                                         {{ v.lider_asignado.nombre }} {{ v.lider_asignado.apellido }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- CÉDULA DEL LIDER -->
-                                <td class="font-monospace text-center">
-                                    {% if v.lider_asignado %}
-                                        {{ v.lider_asignado.cedula }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- TELÉFONO DEL LIDER -->
-                                <td class="font-monospace text-center">
-                                    {% if v.lider_asignado %}
-                                        {{ v.lider_asignado.telefono }}
                                     {% else %}
                                         —
                                     {% endif %}
