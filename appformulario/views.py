@@ -183,7 +183,7 @@ def exportar_votantes_excel(request):
             # 'Teléfono líder': safe(v.lider_asignado.telefono if v.lider_asignado else None),
 
             # Estado
-            'Estado': safe(v.get_status_display()),
+            # 'Estado': safe(v.get_status_display()),
         })
 
     # Crear DataFrame
