@@ -84,7 +84,7 @@
                 </div>
             </div>
                 
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
                     <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light sticky-top">
                             <tr>
@@ -251,6 +251,49 @@
                         </tbody>
                     </table>
                 </div>
+
+                <nav aria-label="Navegación de páginas" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        
+                        {% if votantes.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Primera">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ votantes.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Anterior">
+                                    &laquo;
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">&laquo;&laquo;</span></li>
+                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                        {% endif %}
+
+                        <li class="page-item disabled">
+                            <span class="page-link text-dark">
+                                Página {{ votantes.number }} de {{ votantes.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if votantes.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ votantes.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Siguiente">
+                                    &raquo;
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ votantes.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Última">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                            <li class="page-item disabled"><span class="page-link">&raquo;&raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
 
             </div>
         </div>

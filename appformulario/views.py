@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.core.paginator import Paginator
 from django.db.models import Q
 
 from .forms import VotanteForm
@@ -19,27 +20,31 @@ import pandas as pd
 @permission_required('appformulario.view_votante', raise_exception=True)
 def lista_votantes(request):
     query = request.GET.get('q')
-    
     status_filter = request.GET.get('status')
     
-    votantes = votante.objects.all()
+    # Es importante ordenar los resultados para que la paginación sea consistente
+    votantes_list = votante.objects.all().order_by('-id') # O por 'apellido'
 
-    # Aplicar el filtro de estado si existe y no está vacío
+    # Aplicar el filtro de estado si existe
     if status_filter:
-        votantes = votantes.filter(status=status_filter)
+        votantes_list = votantes_list.filter(status=status_filter)
     
     # Aplicar el filtro de búsqueda general (q)
     if query:
-        votantes = votantes.filter(
+        votantes_list = votantes_list.filter(
             Q(nombre__icontains=query) |
             Q(apellido__icontains=query) |
             Q(cedula__icontains=query) |
             Q(puesto_votacion__nombre_lugar__icontains=query)
         )
     
-    # Pasar el estado activo al template para resaltar el botón
+    # --- LÓGICA DE PAGINACIÓN ---
+    paginator = Paginator(votantes_list, 10) # Muestra 10 votantes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'votantes/lista.html', {
-        'votantes': votantes,
+        'votantes': page_obj, # Ahora pasamos el objeto paginado
         'query': query,
         'status_filter': status_filter 
     })
