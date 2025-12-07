@@ -62,6 +62,29 @@
                     </div>
 
                 <div class="col-md-5 d-flex justify-content-end">
+                    <!-- <span class="small text-muted mb-1 d-none d-md-block">Filtrar por rol:</span> -->
+                    <div class="btn-group" role="group" aria-label="Filtro de Rol">
+                        
+                        {# Enlaces de filtro de Rol. Importante: mantienen query (q) y status #}
+                        
+                        <a href="{% url 'lista_votantes' %}?{% if query %}q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
+                        class="btn btn-sm {% if not rol_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}" title="Mostrar Todos los Roles">
+                            Todos
+                        </a>
+                        
+                        <a href="{% url 'lista_votantes' %}?rol=VOTANTE{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
+                        class="btn btn-sm {% if rol_filter == 'VOTANTE' %}btn-dark{% else %}btn-outline-info{% endif %}" title="Mostrar solo Votantes">
+                            Votantes
+                        </a>
+                        
+                        <a href="{% url 'lista_votantes' %}?rol=LIDER_VOTANTE{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
+                        class="btn btn-sm {% if rol_filter == 'LIDER_VOTANTE' %}btn-dark{% else %}btn-outline-primary{% endif %}" title="Mostrar solo Líderes">
+                            Líderes
+                        </a>
+                    </div>
+                </div>
+
+                <!-- <div class="col-md-5 d-flex justify-content-end">
                     <span class="small text-muted me-2 mt-1 d-none d-md-block">Filtrar por estado:</span>
                     
                     <div class="btn-group" role="group" aria-label="Filtro de Estado">
@@ -81,7 +104,7 @@
                             Inactivos
                         </a>
                     </div>
-                </div>
+                </div> -->
             </div>
                 
                 <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">

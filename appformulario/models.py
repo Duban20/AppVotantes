@@ -4,7 +4,7 @@ from AppMunicipio.models import Municipio
 from AppPuestoVotacion.models import PuestoVotacion
 from appmesa.models import Mesa
 
-class votante(models.Model):
+class Votante(models.Model):
     STATUS_CHOICES = [
         ('ACTIVE', 'Activo'),
         ('INACTIVE', 'Inactivo'),

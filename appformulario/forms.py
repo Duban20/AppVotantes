@@ -2,7 +2,7 @@ from django import forms
 from appmesa.models import Mesa
 from AppPuestoVotacion.models import PuestoVotacion  
 from AppMunicipio.models import Municipio
-from .models import votante
+from .models import Votante
 
 
 class VotanteForm(forms.ModelForm):
@@ -13,7 +13,7 @@ class VotanteForm(forms.ModelForm):
         # Si estás editando un votante, excluir ese mismo registro
         votante_id = self.instance.pk
 
-        if votante.objects.filter(cedula=cedula).exclude(pk=votante_id).exists():
+        if Votante.objects.filter(cedula=cedula).exclude(pk=votante_id).exists():
             raise forms.ValidationError("Esta cédula ya está registrada.")
 
         return cedula
@@ -48,7 +48,7 @@ class VotanteForm(forms.ModelForm):
 
         # --- LÍDER ASIGNADO ---
         # Mostrar solo líderes (rol = LIDER_VOTANTE)
-        self.fields['lider_asignado'].queryset = votante.objects.filter(
+        self.fields['lider_asignado'].queryset = Votante.objects.filter(
             rol='LIDER_VOTANTE',
             status='ACTIVE'
         ).order_by('nombre', 'apellido')
@@ -58,7 +58,7 @@ class VotanteForm(forms.ModelForm):
 
 
     class Meta:
-        model = votante
+        model = Votante
         fields = [
             'rol',
             'nombre',

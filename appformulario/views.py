@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 from .forms import VotanteForm
-from .models import votante
+from .models import Votante
 from django.http import JsonResponse
 from appmesa.models import Mesa
 from io import BytesIO
@@ -21,13 +21,18 @@ import pandas as pd
 def lista_votantes(request):
     query = request.GET.get('q')
     status_filter = request.GET.get('status')
+    rol_filter = request.GET.get('rol')
     
     # Es importante ordenar los resultados para que la paginación sea consistente
-    votantes_list = votante.objects.all().order_by('-id') # O por 'apellido'
+    votantes_list = Votante.objects.all().order_by('-id') # O por 'apellido'
 
     # Aplicar el filtro de estado si existe
     if status_filter:
         votantes_list = votantes_list.filter(status=status_filter)
+
+    # Aplicar el filtro de rol si existe
+    if rol_filter:
+        votantes_list = votantes_list.filter(rol=rol_filter)
     
     # Aplicar el filtro de búsqueda general (q)
     if query:
@@ -46,7 +51,8 @@ def lista_votantes(request):
     return render(request, 'votantes/lista.html', {
         'votantes': page_obj, # Ahora pasamos el objeto paginado
         'query': query,
-        'status_filter': status_filter 
+        'status_filter': status_filter,
+        'rol_filter': rol_filter
     })
 
 @login_required
@@ -67,7 +73,7 @@ def crear_votante(request):
 @login_required
 @permission_required('appformulario.change_votante', raise_exception=True)
 def editar_votante(request, pk):
-    vot = get_object_or_404(votante, pk=pk)
+    vot = get_object_or_404(Votante, pk=pk)
     if request.method == 'POST':
         form = VotanteForm(request.POST, instance=vot)
         if form.is_valid():
@@ -83,7 +89,7 @@ def editar_votante(request, pk):
 @login_required
 @permission_required('appformulario.delete_votante', raise_exception=True)
 def eliminar_votante(request, pk):
-    vot = get_object_or_404(votante, pk=pk)
+    vot = get_object_or_404(Votante, pk=pk)
     try:
         vot.delete()
         messages.success(request, "✅ Votante eliminado.")
@@ -94,7 +100,7 @@ def eliminar_votante(request, pk):
 @login_required
 @permission_required('appformulario.change_status_votante', raise_exception=True)
 def cambiar_estado_votante(request, pk):
-    vot = get_object_or_404(votante, pk=pk)
+    vot = get_object_or_404(Votante, pk=pk)
     
     if vot.status == 'ACTIVE':
         vot.status = 'INACTIVE'
@@ -133,7 +139,7 @@ def exportar_votantes_excel(request):
         return value if value not in [None, '', ' '] else '-'
 
     # Obtener solo votantes activos
-    votantes = votante.objects.filter(status='ACTIVE').select_related(
+    votantes = Votante.objects.filter(status='ACTIVE').select_related(
         'puesto_votacion',
         'mesa',
         'municipio_residencia',

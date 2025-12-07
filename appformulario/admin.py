@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import votante
+from .models import Votante
 
 
 class VotanteAdmin(admin.ModelAdmin):
@@ -140,4 +140,4 @@ class VotanteAdmin(admin.ModelAdmin):
 
 
 # Registrar admin
-admin.site.register(votante, VotanteAdmin)
+admin.site.register(Votante, VotanteAdmin)

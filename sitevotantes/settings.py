@@ -80,33 +80,33 @@ WSGI_APPLICATION = 'sitevotantes.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
+DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': config('MYSQL_NAME'),
-#         'USER': config('MYSQL_USER'),
-#         'PASSWORD': config('MYSQL_PASSWORD'),
-#         'HOST': config('MYSQL_HOST'),
-#         'PORT': config('MYSQL_PORT'),
-#         'OPTIONS': {
-#             'charset': 'utf8mb4',
-#         },
-#     }
-# }
-
-# Produccion postgres
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES_NAME'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('POSTGRES_HOST'),
-        'PORT': config('POSTGRES_PORT', default='5432'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('MYSQL_NAME'),
+        'USER': config('MYSQL_USER'),
+        'PASSWORD': config('MYSQL_PASSWORD'),
+        'HOST': config('MYSQL_HOST'),
+        'PORT': config('MYSQL_PORT'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
+
+# # Produccion postgres
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('POSTGRES_NAME'),
+#         'USER': config('POSTGRES_USER'),
+#         'PASSWORD': config('POSTGRES_PASSWORD'),
+#         'HOST': config('POSTGRES_HOST'),
+#         'PORT': config('POSTGRES_PORT', default='5432'),
+#     }
+# }
 
 
 # Password validation
@@ -159,7 +159,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # URL a la que se redirige cuando un usuario no autenticado intenta acceder a una vista protegida
 LOGIN_URL = '/login/'
 # Redirige al usuario después de iniciar sesión
-LOGIN_REDIRECT_URL = '/personas'  
+LOGIN_REDIRECT_URL = '/dashboard/'  
 # Redirige al usuario después de cerrar sesión
 LOGOUT_REDIRECT_URL = '/'  
 # ---------------------
