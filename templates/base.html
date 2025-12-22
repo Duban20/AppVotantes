@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Votación{% endblock %}</title>
+
+    <!-- Estilo de Fuente -->
+    <link rel="stylesheet" href="{% static 'fonts/inter.css' %}">
+
+    <!-- Estilos de Bootstrap y Bootstrap Icons -->
+    <link href="{% static 'Bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'bootstrap-icons/bootstrap-icons.css' %}">
+
+    <style>
+        /* --- Variables y Estilos Globales --- */
+        :root {
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --color-bg: #f8fafc;
+            --color-text: #1e293b;
+            --color-primary: #2563eb;
+            --navbar-height: 70px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* --- Navbar Moderno --- */
+        .navbar-custom {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: var(--navbar-height);
+            padding: 0.5rem 1rem;
+            z-index: 1040;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: #0f172a !important;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            color: #64748b !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-left: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--color-primary) !important;
+        }
+
+        /* --- Botón de Login --- */
+        .btn-login {
+            background-color: var(--color-text);
+            color: white;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            margin-left: 1.5rem;
+        }
+
+        .btn-login:hover {
+            background-color: transparent;
+            color: var(--color-text);
+            border-color: var(--color-text);
+            transform: translateY(-1px);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* --- Botón de Logout --- */
+        .btn-logout-minimal {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #6c757d; /* Color gris suave por defecto */
+            padding: 8px 16px;
+            border-radius: 50px; /* Forma de píldora */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .btn-logout-minimal:hover {
+            color: #dc3545; /* Rojo Bootstrap */
+            background-color: rgba(220, 53, 69, 0.1); /* Fondo rojo muy sutil */
+            border-color: rgba(220, 53, 69, 0.2);
+            transform: translateY(-1px); /* Pequeña elevación */
+        }
+
+        .btn-logout-minimal i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-logout-minimal:hover i {
+            transform: translateX(3px); /* El icono se mueve un poco a la derecha */
+        }
+
+        /* --- Caja de Saludo de Usuario --- */
+        .user-greeting-box {
+            display: flex;
+            align-items: baseline; /* Alinea el texto en la base */
+            gap: 5px;
+            padding: 0 10px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .greeting-text {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .username-text {
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 700; /* Negrita para destacar el nombre */
+            letter-spacing: -0.3px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom navbar-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">Gestión Electoral</a>
+
+        <!-- button: añadidos aria-controls/aria-expanded/aria-label -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Alternar navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="/">Inicio</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/personas/">Personas</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/puestos/">Puestos</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/municipios/">Municipios</a>
+                </li> -->
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item ms-3 d-flex align-items-center">
+                        <div class="user-greeting-box">
+                            <span class="greeting-text">Hola,</span>
+                            <span class="username-text">{{ user.username }}</span>
+                        </div>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <form action="/logout/" method="post">
+                            {% csrf_token %} 
+                            <button type="submit" class="btn-logout-minimal" title="Cerrar Sesión">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="d-none d-md-inline ms-2 text-sm">Cerrar Sesión</span> </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <!-- <li class="nav-item">
+                        <a href="/login/" class="btn btn-login">
+                            Iniciar Sesión
+                        </a>
+                    </li> -->
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-5">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- <footer class="text-center py-2 mt-auto">
+    <div class="container">
+        <p class="mb-0 small">© 2025 Sistema de Gestión de Votantes</p>
+    </div>
+</footer> -->
+
+<footer class="text-center py-2 mt-auto bg-transparent border-0">
+    <p class="mb-0 text-muted small">© 2025 Sistema de Gestión Electoral</p>
+</footer>
+
+<script src="{% static 'Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+</html>

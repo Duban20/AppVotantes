@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión Electoral{% endblock %}
+
+{% block content %}
+
+<!-- Contenedor principal centrado verticalmente para evitar scroll -->
+<div class="d-flex flex-column justify-content-center align-items-center" 
+     style="height: 70vh; min-height: 500px; margin-top: -20px;">
+    
+    <!-- Sección de Encabezado -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-primary mb-3">Sistema de Gestión Electoral</h1>
+        <div class="col-lg-8 mx-auto">
+            <p class="text-muted mb-0 lead">
+                Plataforma centralizada para gestión de votantes, líderes y logística electoral.
+                Seleccione su rol para continuar.
+            </p>
+        </div>
+    </div>
+
+    <!-- Sección de Selección de Roles -->
+    <div class="row justify-content-center w-100 g-4">
+        
+        <!-- Tarjeta Administrador -->
+        <div class="col-md-5 col-lg-4 col-xl-3">
+            <a href="/admin" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-role card-hover-up">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-dark text-white mb-3 mx-auto shadow-sm">
+                            <i class="bi bi-shield-lock-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark">Administrador</h4>
+                        <p class="card-text text-muted small mt-2 mb-4">
+                            Configuración total, gestión de usuarios y auditoría del sistema.
+                        </p>
+                        <span class="btn btn-dark rounded-pill px-4 w-100">Ingresar al Panel</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Tarjeta Trabajador -->
+        <div class="col-md-5 col-lg-4 col-xl-3">
+            <a href="/dashboard" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-role card-hover-up">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-primary text-white mb-3 mx-auto shadow-sm">
+                            <i class="bi bi-person-badge-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-primary">Trabajador</h4>
+                        <p class="card-text text-muted small mt-2 mb-4">
+                            Registro de aspirantes, asignación de puestos y consulta de datos.
+                        </p>
+                        <span class="btn btn-primary rounded-pill px-4 w-100">Gestionar Registros</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .card-role {
+        transition: all 0.3s ease;
+        border-radius: 1rem;
+    }
+
+    .card-hover-up:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.15)!important;
+    }
+
+    .card-hover-up:hover .btn-primary {
+        background-color: #0b5ed7;
+        transform: scale(1.02);
+    }
+    
+    .card-hover-up:hover .btn-dark {
+        background-color: #212529;
+        transform: scale(1.02);
+    }
+    
+    .btn {
+        transition: transform 0.2s;
+    }
+</style>
+
+{% endblock %}
