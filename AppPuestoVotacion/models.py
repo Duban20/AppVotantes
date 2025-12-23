@@ -1,7 +1,10 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from smart_selects.db_fields import ChainedForeignKey
+
 from AppMunicipio.models import Municipio
+from appcorregimientos.models import Corregimiento
 from appdepartamento.models import Departamento
 
 class PuestoVotacion(models.Model):
@@ -22,12 +25,33 @@ class PuestoVotacion(models.Model):
         blank=True, null=True,
         help_text="Ingrese la dirección del puesto (opcional)"
     )
-    
-    municipio = models.ForeignKey(
-        Municipio,
+
+    departamento = models.ForeignKey(
+        Departamento,
         on_delete=models.PROTECT,
-        verbose_name="Municipio o Corregimiento",
+        verbose_name="Departamento"
+    )
+    
+    municipio = ChainedForeignKey(
+        Municipio,
+        chained_field="departamento",
+        chained_model_field="departamento",
+        show_all=False, 
+        on_delete=models.PROTECT,
+        verbose_name="Municipio",
         help_text="Seleccione la ubicación geográfica del puesto."
+    )
+
+    corregimiento = ChainedForeignKey(
+        Corregimiento,
+        chained_field="municipio",
+        chained_model_field="municipio",
+        show_all=False,
+        auto_choose=False,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name="Corregimiento"
     )
 
     status = models.CharField(
@@ -37,6 +61,12 @@ class PuestoVotacion(models.Model):
         verbose_name='Estado',
         help_text="Estado actual (Activo/Inactivo)."
     )
+
+    def clean(self):
+        if self.corregimiento and self.corregimiento.municipio != self.municipio:
+            raise ValidationError(
+                "El corregimiento no pertenece al municipio seleccionado."
+            )
 
     def __str__(self):
         return f"{self.nombre_lugar} – {self.municipio}"

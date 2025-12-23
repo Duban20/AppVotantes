@@ -10,7 +10,7 @@ class Municipio(models.Model):
     nombre = models.CharField(
         max_length=150, 
         unique=True,
-        verbose_name="Nombre del Municipio / Corregimiento",
+        verbose_name="Nombre del Municipio",
         help_text="Ingrese el nombre del municipio o corregimiento."
     )
 

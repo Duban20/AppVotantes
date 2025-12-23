@@ -36,4 +36,7 @@ urlpatterns = [
 
     # Apps
     path('personas/', include('appformulario.urls')),
+
+    # Smart Select
+    path('chaining/', include('smart_selects.urls')),
 ]

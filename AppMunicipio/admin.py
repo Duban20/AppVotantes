@@ -9,19 +9,57 @@ class CorregimientoInline(admin.TabularInline):
     autocomplete_fields = ('municipio',) 
 
 class MunicipioAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'departamento')
-    search_fields = ('nombre', 'departamento__nombre')
+    
+     # ---------- LISTADO ----------
+    list_display = (
+        'nombre',
+        'departamento',
+        'status',
+    )
+
+    list_filter = (
+        'departamento',
+        'status',
+    )
+
+    search_fields = (
+        'nombre',
+        'departamento__nombre',
+    )
+
     ordering = ('nombre',)
 
     autocomplete_fields = ('departamento',)
 
-    fieldsets = (
-        ('Información del Municipio', {
-            'fields': ('nombre', 'departamento'),
-        }),
-    )
-
     inlines = [CorregimientoInline]
 
+    # ---------- OPTIMIZACIÓN ----------
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('departamento')
+
+    # ---------- FIELDSETS DINÁMICOS ----------
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            # CREAR (sin estado)
+            return (
+                ('Información del Municipio', {
+                    'fields': (
+                        'nombre',
+                        'departamento',
+                    )
+                }),
+            )
+        else:
+            # EDITAR (con estado)
+            return (
+                ('Información del Municipio', {
+                    'fields': (
+                        'nombre',
+                        'departamento',
+                        'status',
+                    )
+                }),
+            )
 
 admin.site.register(Municipio, MunicipioAdmin)

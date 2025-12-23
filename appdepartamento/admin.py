@@ -8,22 +8,31 @@ class MunicipioInline(admin.TabularInline):
     fields = ('nombre',)
     
 class DepartamentoAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
+    list_display = ('nombre', 'status')
     list_filter = ('status',)
     search_fields = ('nombre',)
     ordering = ('nombre',)
 
-    fieldsets = (
-        ('Información de departamentos', {
-            'fields': ('nombre',)
-        }),
-    )
+    # ---------- FIELDSETS DINÁMICOS ----------
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            # CREAR (sin estado)
+            return (
+                ('Información de departamentos', {
+                    'fields': ('nombre',)
+                }),
+            )
+        else:
+            # EDITAR (con estado)
+            return (
+                ('Información de departamentos', {
+                    'fields': (
+                        'nombre',
+                        'status',
+                    )
+                }),
+            )
 
     inlines = [MunicipioInline]
-
-    # Filtrar solo departamentos activos 
-    def get_queryset(self, request):
-        return Departamento.objects.filter(status='ACTIVE')
-
 
 admin.site.register(Departamento, DepartamentoAdmin)

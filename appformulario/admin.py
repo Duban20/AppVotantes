@@ -4,7 +4,7 @@ from .models import Votante
 
 class VotanteAdmin(admin.ModelAdmin):
 
-    # Columnas visibles en la tabla del admin
+    # ---------- LISTADO ----------
     list_display = (
         'nombre',
         'apellido',
@@ -23,7 +23,6 @@ class VotanteAdmin(admin.ModelAdmin):
         'status',
     )
 
-    # Filtros
     list_filter = (
         'status',
         'rol',
@@ -32,7 +31,6 @@ class VotanteAdmin(admin.ModelAdmin):
         'mesa__puesto_votacion',
     )
 
-    # Campos de búsqueda
     search_fields = (
         'nombre',
         'apellido',
@@ -46,10 +44,9 @@ class VotanteAdmin(admin.ModelAdmin):
 
     ordering = ('apellido', 'nombre')
 
-    # Autocomplete
     autocomplete_fields = ('mesa', 'lider_asignado')
 
-    # Fieldsets organizados
+    # ---------- FIELDSETS ----------
     fieldsets = (
         ('Información Personal', {
             'fields': (
@@ -63,7 +60,6 @@ class VotanteAdmin(admin.ModelAdmin):
                 'telefono',
             )
         }),
-
         ('Datos Electorales', {
             'fields': (
                 'lider_asignado',
@@ -74,12 +70,22 @@ class VotanteAdmin(admin.ModelAdmin):
         }),
     )
 
+    # ---------- OPTIMIZACIÓN ----------
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related(
+            'lider_asignado',
+            'mesa',
+            'mesa__puesto_votacion',
+            'mesa__puesto_votacion__municipio',
+            'mesa__puesto_votacion__municipio__departamento',
+        )
+
     # ---------------------------------------------------
-    # MÉTODOS PERSONALIZADOS PARA COLUMNAS DEL ADMIN
+    # COLUMNAS PERSONALIZADAS
     # ---------------------------------------------------
 
     def lider_nombre(self, obj):
-        """Devuelve el nombre del líder asignado."""
         if obj.lider_asignado:
             return f"{obj.lider_asignado.nombre} {obj.lider_asignado.apellido}"
         return "—"
@@ -95,48 +101,39 @@ class VotanteAdmin(admin.ModelAdmin):
     lider_telefono.short_description = "Teléfono Líder"
 
     def mesa_numero(self, obj):
-        """Número de mesa."""
         return obj.mesa.numero if obj.mesa else "—"
     mesa_numero.short_description = "Mesa"
     mesa_numero.admin_order_field = "mesa__numero"
 
     def puesto_direccion(self, obj):
-        """Dirección del puesto de votación."""
         try:
             pv = obj.mesa.puesto_votacion
             return pv.direccion if pv else "—"
-        except:
+        except Exception:
             return "—"
     puesto_direccion.short_description = "Dirección Puesto"
     puesto_direccion.admin_order_field = "mesa__puesto_votacion__direccion"
 
     def puesto_nombre(self, obj):
-        """Nombre del puesto."""
         try:
             pv = obj.mesa.puesto_votacion
             return pv.nombre_lugar if pv else "—"
-        except:
+        except Exception:
             return "—"
     puesto_nombre.short_description = "Puesto"
     puesto_nombre.admin_order_field = "mesa__puesto_votacion__nombre_lugar"
 
     def municipio_y_departamento_puesto(self, obj):
-        """Municipio y departamento del puesto."""
         try:
             municipio = obj.mesa.puesto_votacion.municipio
             if municipio:
                 depto = municipio.departamento.nombre if municipio.departamento else ''
                 return f"{municipio.nombre} – {depto}" if depto else municipio.nombre
-        except:
+        except Exception:
             pass
         return "—"
     municipio_y_departamento_puesto.short_description = "Mun. – Departamento (Puesto)"
     municipio_y_departamento_puesto.admin_order_field = "mesa__puesto_votacion__municipio__nombre"
-
-    # Filtro personalizado para puesto (porque no es FK directo)
-    def puesto_votacion_filtro(self, obj):
-        return obj.mesa.puesto_votacion.nombre_lugar if obj.mesa else "—"
-    puesto_votacion_filtro.short_description = "Puesto de Votación"
 
 
 # Registrar admin
