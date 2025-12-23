@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['72.62.86.17','localhost','127.0.0.1']
 
@@ -82,33 +82,33 @@ WSGI_APPLICATION = 'sitevotantes.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
+# DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('MYSQL_NAME'),
-        'USER': config('MYSQL_USER'),
-        'PASSWORD': config('MYSQL_PASSWORD'),
-        'HOST': config('MYSQL_HOST'),
-        'PORT': config('MYSQL_PORT'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
-    }
-}
-
-# Produccion postgres
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('POSTGRES_NAME'),
-#         'USER': config('POSTGRES_USER'),
-#         'PASSWORD': config('POSTGRES_PASSWORD'),
-#         'HOST': config('POSTGRES_HOST'),
-#         'PORT': config('POSTGRES_PORT', default='5432'),
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': config('MYSQL_NAME'),
+#         'USER': config('MYSQL_USER'),
+#         'PASSWORD': config('MYSQL_PASSWORD'),
+#         'HOST': config('MYSQL_HOST'),
+#         'PORT': config('MYSQL_PORT'),
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#         },
 #     }
 # }
+
+# Produccion postgres
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('POSTGRES_NAME'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST'),
+        'PORT': config('POSTGRES_PORT', default='5432'),
+    }
+}
 
 
 # Password validation
