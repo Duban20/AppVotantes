@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from AppMunicipio.models import Municipio
 from AppPuestoVotacion.models import PuestoVotacion
@@ -119,6 +120,9 @@ class Votante(models.Model):
         verbose_name='Estado',
         help_text="Estado actual (Activo/Inactivo)."
     )
+
+    # Auditoría
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"

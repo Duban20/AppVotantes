@@ -1,8 +1,9 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from .models import Votante
 
 
-class VotanteAdmin(admin.ModelAdmin):
+class VotanteAdmin(SimpleHistoryAdmin):
 
     # ---------- LISTADO ----------
     list_display = (

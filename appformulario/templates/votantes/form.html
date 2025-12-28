@@ -34,7 +34,7 @@
                     <!-- ============================= -->
                     <!--   SECCIÓN 1: DATOS PERSONALES -->
                     <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-primary">Datos Personales</h5>
+                    <h5 class="fw-bold mb-3 text-success">Datos Personales</h5>
 
                     <div class="row">
 
@@ -146,7 +146,7 @@
                     <!-- ============================= -->
                     <!--       SECCIÓN 2: LÍDER        -->
                     <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-primary">Líder</h5>
+                    <h5 class="fw-bold mb-3 text-success">Líder</h5>
 
                     <div class="row">
 
@@ -195,7 +195,7 @@
                     <!-- ============================= -->
                     <!--   SECCIÓN 3: PUESTO VOTACIÓN  -->
                     <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-primary">Puesto de Votación</h5>
+                    <h5 class="fw-bold mb-3 text-success">Puesto de Votación</h5>
 
                     <div class="row">
 
@@ -256,7 +256,7 @@
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
                         <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">Cancelar</a>
-                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">Guardar Datos</button>
+                        <button type="submit" class="btn btn-success rounded-pill px-5 py-2 shadow-sm">Guardar Datos</button>
                     </div>
 
                 </form>
@@ -267,14 +267,45 @@
     </div>
 </div>
 
-<!-- AUTORRELLENAR DATOS DEL LIDER (unificado) -->
+<!-- ============================================ -->
+<!--   SCRIPT: LIDER, PUESTO, MESAS, DEPARTAMENTO, MUNICIPIO Y CORREGIMIENTO -->
+<!-- ============================================ -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const selectLider = document.getElementById("id_lider_asignado");
-    const cedulaInput = document.getElementById("cedula_lider");
-    const telefonoInput = document.getElementById("telefono_lider");
 
+    // =========================
+    // SELECTORES DEL FORMULARIO
+    // =========================
+    const selectLider    = document.getElementById("id_lider_asignado");
+    const cedulaInput    = document.getElementById("cedula_lider");
+    const telefonoInput  = document.getElementById("telefono_lider");
+
+    const selectPuesto   = document.getElementById("id_puesto_votacion");
+    const selectMesa     = document.getElementById("id_mesa");
+
+    const direccionInput  = document.getElementById("direccion_puesto");
+    const municipioInput  = document.getElementById("municipio");
+    const departamentoInput = document.getElementById("departamento");
+
+    const roleSelect     = document.getElementById("id_rol");
+    const roleRadios     = document.querySelectorAll('input[name="rol"]');
+
+    const selectDepartamento = document.getElementById("id_departamento_residencia");
+    const selectMunicipio    = document.getElementById("id_municipio_residencia");
+    const selectCorreg       = document.getElementById("id_corregimiento_residencia");
+
+    // =========================
+    // VALORES GUARDADOS AL EDITAR
+    // =========================
+    const mesaSeleccionada     = "{{ form.mesa.value|default:'' }}";
+    const municipioSeleccionado  = "{{ form.municipio_residencia.value|default:'' }}";
+    const corregSeleccionado     = "{{ form.corregimiento_residencia.value|default:'' }}";
+
+    // =========================
+    // AUTORELLENAR DATOS DEL LIDER
+    // =========================
     function fillLiderFields() {
+        if (!selectLider) return;
         const opt = selectLider.options[selectLider.selectedIndex];
         if (opt && opt.value) {
             cedulaInput.value = opt.dataset.cedula || "";
@@ -284,183 +315,127 @@ document.addEventListener("DOMContentLoaded", function () {
             telefonoInput.value = "";
         }
     }
-
     if (selectLider) {
         selectLider.addEventListener("change", fillLiderFields);
-        // Rellenar al cargar en caso de edición
-        fillLiderFields();
+        fillLiderFields(); // al cargar
     }
-});
-</script>
 
-<!-- JAVASCRIPT PARA CARGAR MESAS SEGÚN EL PUESTO -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    // =========================
+    // AUTORELLENAR DATOS DEL PUESTO
+    // =========================
+    function fillPuestoFields() {
+        if (!selectPuesto) return;
+        const opt = selectPuesto.options[selectPuesto.selectedIndex];
+        if (opt) {
+            direccionInput.value  = opt.dataset.direccion || "";
+            municipioInput.value  = opt.dataset.municipio || "";
+            departamentoInput.value = opt.dataset.departamento || "";
+        }
+    }
+    if (selectPuesto) {
+        selectPuesto.addEventListener("change", fillPuestoFields);
+        fillPuestoFields(); // al cargar
+    }
 
-    const selectPuesto = document.getElementById("id_puesto_votacion");
-    const selectMesa   = document.getElementById("id_mesa");
-
-    // Obtener la mesa seleccionada al cargar el formulario (si estamos editando)
-    const mesaSeleccionada = "{{ form.mesa.value|default:'' }}";
-
-    // --- Función para cargar mesas ---
+    // =========================
+    // CARGAR MESAS SEGÚN EL PUESTO
+    // =========================
     function cargarMesas(puestoId) {
+        if (!selectMesa) return;
 
         if (!puestoId) {
-            // No hay puesto → deshabilitar select de mesa
             selectMesa.innerHTML = "<option>Seleccione un puesto</option>";
             selectMesa.disabled = true;
             return;
         }
 
-        // Cargar mesas vía AJAX
         fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
-        .then(response => response.json())
-        .then(data => {
-
-            selectMesa.innerHTML = "";
-            selectMesa.disabled = false; // Habilitar
-
-            // Añadir opción vacía para que no quede ninguna seleccionada por defecto
-            selectMesa.innerHTML = '<option value="">Seleccione una mesa</option>';
-
-            data.mesas.forEach(m => {
-                const opt = document.createElement("option");
-                opt.value = m.id;
-                opt.textContent = "Mesa " + m.numero;
-
-                // Marcar mesa seleccionada al editar
-                if (mesaSeleccionada == m.id) {
-                    opt.selected = true;
-                }
-
-                selectMesa.appendChild(opt);
+            .then(res => res.json())
+            .then(data => {
+                selectMesa.innerHTML = '<option value="">Seleccione una mesa</option>';
+                selectMesa.disabled = false;
+                data.mesas.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m.id;
+                    opt.textContent = "Mesa " + m.numero;
+                    if (mesaSeleccionada == m.id) opt.selected = true;
+                    selectMesa.appendChild(opt);
+                });
             });
+    }
+    if (selectPuesto) {
+        selectPuesto.addEventListener("change", function() {
+            cargarMesas(this.value);
         });
-    }
-
-    // --- Evento al cambiar puesto ---
-    selectPuesto.addEventListener("change", function () {
-        cargarMesas(this.value);
-    });
-
-    // --- Al cargar la página ---
-    if (selectPuesto.value) {
-        // Si estamos editando, cargar mesas y habilitar
-        cargarMesas(selectPuesto.value);
-    } else {
-        // Si no hay puesto seleccionado → deshabilitar
-        selectMesa.innerHTML = "<option>Seleccione un puesto</option>";
-        selectMesa.disabled = true;
-    }
-
-});
-</script>
-
-<!-- AUTORRELLENAR DATOS DEL PUESTO -->
-<script>
-document.getElementById("id_puesto_votacion").addEventListener("change", function () {
-
-    const option = this.options[this.selectedIndex];
-
-    document.getElementById("direccion_puesto").value = option.dataset.direccion || "";
-    document.getElementById("municipio").value        = option.dataset.municipio || "";
-    document.getElementById("departamento").value     = option.dataset.departamento || "";
-});
-</script>
-
-<!-- AUTORRELLENAR DATOS DEL PUESTO AL EDITAR -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const option = document.querySelector("#id_puesto_votacion option:checked");
-
-    if (option) {
-        document.getElementById("direccion_puesto").value = option.dataset.direccion || "";
-        document.getElementById("municipio").value        = option.dataset.municipio || "";
-        document.getElementById("departamento").value     = option.dataset.departamento || "";
-    }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const leaderSelect = document.getElementById("id_lider_asignado"); // select de líderes
-    const roleSelect   = document.getElementById("id_rol");          // select normal (si existe)
-    const roleRadios   = document.querySelectorAll('input[name="rol"]'); // radioselect (si aplica)
-
-    if (!leaderSelect) return; // si no existe, nada que hacer
-
-    // Crear (o reutilizar) el contenedor del mensaje informativo
-    let infoMsg = document.getElementById("lider-info-msg");
-    if (!infoMsg) {
-        infoMsg = document.createElement("div");
-        infoMsg.id = "lider-info-msg";
-        // Usamos una alerta pequeña de bootstrap y aria-live para accesibilidad
-        infoMsg.className = "alert alert-info small py-1 mt-2";
-        infoMsg.setAttribute("role", "status");
-        infoMsg.setAttribute("aria-live", "polite");
-        // Texto por defecto (se reemplaza dinámicamente)
-        infoMsg.textContent = "";
-        // Insertar después del select de líder (si hay un contenedor padre adecuado)
-        leaderSelect.parentNode.insertBefore(infoMsg, leaderSelect.nextSibling);
-    }
-
-    function isRoleLeader(value) {
-        if (!value) return false;
-        return value.toString().toUpperCase().includes("LIDER");
-    }
-
-    function toggleLeaderSelect(isLeader) {
-        if (isLeader) {
-            // Deshabilitar y limpiar selección
-            leaderSelect.disabled = true;
-            leaderSelect.value = "";
-            leaderSelect.selectedIndex = 0; // mostrar la opción por defecto
-
-            // Mostrar mensaje informativo
-            infoMsg.textContent = "Al seleccionar el rol «Líder», este votante no puede tener un líder asignado. El campo se ha deshabilitado automáticamente.";
-            infoMsg.style.display = "block";
-            leaderSelect.setAttribute("aria-disabled", "true");
-            leaderSelect.classList.add("disabled");
-        } else {
-            // Habilitar y ocultar mensaje
-            leaderSelect.disabled = false;
-            infoMsg.style.display = "none";
-            leaderSelect.removeAttribute("aria-disabled");
-            leaderSelect.classList.remove("disabled");
+        if (selectPuesto.value) cargarMesas(selectPuesto.value);
+        else {
+            selectMesa.innerHTML = "<option>Seleccione un puesto</option>";
+            selectMesa.disabled = true;
         }
     }
 
-    // Inicializar según el estado actual (caso edición)
-    if (roleSelect) {
-        toggleLeaderSelect(isRoleLeader(roleSelect.value));
-        roleSelect.addEventListener("change", function () {
-            toggleLeaderSelect(isRoleLeader(this.value));
-        });
-    }
+    // =========================
+    // HABILITAR / DESHABILITAR SELECT DE LIDER SEGÚN ROL
+    // =========================
+    if (selectLider) {
 
-    if (roleRadios && roleRadios.length) {
-        // Ver cuál está marcado al cargar
-        const checked = Array.from(roleRadios).find(r => r.checked);
-        toggleLeaderSelect(isRoleLeader(checked ? checked.value : ""));
+        // Crear contenedor de mensaje si no existe
+        let infoMsg = document.getElementById("lider-info-msg");
+        if (!infoMsg) {
+            infoMsg = document.createElement("div");
+            infoMsg.id = "lider-info-msg";
+            infoMsg.className = "alert alert-info small py-1 mt-2";
+            infoMsg.setAttribute("role", "status");
+            infoMsg.setAttribute("aria-live", "polite");
+            infoMsg.textContent = "";
+            selectLider.parentNode.insertBefore(infoMsg, selectLider.nextSibling);
+        }
 
-        roleRadios.forEach(radio => {
-            radio.addEventListener("change", function () {
+        function isRoleLeader(value) {
+            if (!value) return false;
+            return value.toString().toUpperCase().includes("LIDER");
+        }
+
+        function toggleLeaderSelect(isLeader) {
+            if (isLeader) {
+                selectLider.disabled = true;
+                selectLider.value = "";
+                selectLider.selectedIndex = 0;
+                infoMsg.textContent = "Al seleccionar el rol «Líder», este votante no puede tener un líder asignado. El campo se ha deshabilitado automáticamente.";
+                infoMsg.style.display = "block";
+                selectLider.setAttribute("aria-disabled", "true");
+                selectLider.classList.add("disabled");
+            } else {
+                selectLider.disabled = false;
+                infoMsg.style.display = "none";
+                selectLider.removeAttribute("aria-disabled");
+                selectLider.classList.remove("disabled");
+            }
+        }
+
+        // Inicializar y agregar eventos
+        if (roleSelect) {
+            toggleLeaderSelect(isRoleLeader(roleSelect.value));
+            roleSelect.addEventListener("change", function() {
                 toggleLeaderSelect(isRoleLeader(this.value));
             });
-        });
+        }
+        if (roleRadios && roleRadios.length) {
+            const checked = Array.from(roleRadios).find(r => r.checked);
+            toggleLeaderSelect(isRoleLeader(checked ? checked.value : ""));
+            roleRadios.forEach(r => {
+                r.addEventListener("change", function() {
+                    toggleLeaderSelect(isRoleLeader(this.value));
+                });
+            });
+        }
     }
-});
-</script>
 
-<!-- Cargar corregimientos según el municipio -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const selectMunicipio = document.getElementById("id_municipio_residencia");
-    const selectCorreg = document.getElementById("id_corregimiento_residencia");
-    const corregSeleccionado = "{{ form.corregimiento_residencia.value|default:'' }}";
-
-    function cargarCorregimientos(municipioId) {
+    // =========================
+    // CARGAR MUNICIPIOS Y CORREGIMIENTOS SEGÚN DEPARTAMENTO
+    // =========================
+    function cargarCorregimientos(municipioId, selectedCorreg = null) {
+        if (!selectCorreg) return;
         if (!municipioId) {
             selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
             selectCorreg.disabled = true;
@@ -468,89 +443,82 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         fetch(`/personas/ajax/corregimientos/?municipio_id=${municipioId}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 selectCorreg.innerHTML = '<option value="">Seleccione (SOLO SI APLICA)</option>';
-                selectCorreg.disabled = false;
-
                 data.corregimientos.forEach(c => {
                     const opt = document.createElement("option");
                     opt.value = c.id;
                     opt.textContent = c.nombre;
-                    if (corregSeleccionado == c.id) {
-                        opt.selected = true;
-                    }
+                    if (selectedCorreg && c.id == selectedCorreg) opt.selected = true;
                     selectCorreg.appendChild(opt);
                 });
+                selectCorreg.disabled = false;
             });
     }
 
-    selectMunicipio.addEventListener("change", function () {
-        cargarCorregimientos(this.value);
-    });
-
-    // Cargar al editar
-    if (selectMunicipio.value) {
-        cargarCorregimientos(selectMunicipio.value);
-    } else {
-        selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-        selectCorreg.disabled = true;
-    }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const selectDepartamento = document.getElementById("id_departamento_residencia");
-    const selectMunicipio    = document.getElementById("id_municipio_residencia");
-    const selectCorreg       = document.getElementById("id_corregimiento_residencia");
-
-    // Deshabilitar municipio y corregimiento al inicio
-    if (!selectDepartamento.value) {
-        selectMunicipio.disabled = true;
-        selectMunicipio.innerHTML = '<option>Seleccione un departamento</option>';
-
-        selectCorreg.disabled = true;
-        selectCorreg.innerHTML = '<option>Seleccione un municipio</option>';
-    }
-
-    function cargarMunicipios(departamentoId) {
+    function cargarMunicipios(departamentoId, selectedMunicipio = null) {
+        if (!selectMunicipio) return;
         if (!departamentoId) {
             selectMunicipio.innerHTML = "<option>Seleccione un departamento</option>";
             selectMunicipio.disabled = true;
-
             selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
             selectCorreg.disabled = true;
             return;
         }
 
         fetch(`/personas/ajax/municipios/?departamento_id=${departamentoId}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 selectMunicipio.innerHTML = '<option value="">Seleccione un municipio</option>';
                 data.municipios.forEach(m => {
                     const opt = document.createElement("option");
                     opt.value = m.id;
                     opt.textContent = m.nombre;
+                    if (selectedMunicipio && m.id == selectedMunicipio) opt.selected = true;
                     selectMunicipio.appendChild(opt);
                 });
                 selectMunicipio.disabled = false;
 
-                // Limpiar corregimientos
-                selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-                selectCorreg.disabled = true;
+                if (selectedMunicipio) {
+                    cargarCorregimientos(selectedMunicipio, corregSeleccionado);
+                } else {
+                    selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
+                    selectCorreg.disabled = true;
+                }
             });
     }
 
-    // Evento al cambiar departamento
-    selectDepartamento.addEventListener("change", function () {
-        cargarMunicipios(this.value);
-    });
-
-    // Cargar municipios al editar
-    if (selectDepartamento.value) {
-        cargarMunicipios(selectDepartamento.value);
+    // =========================
+    // EVENTOS PARA DEPARTAMENTO Y MUNICIPIO
+    // =========================
+    if (selectDepartamento) {
+        selectDepartamento.addEventListener("change", function () {
+            cargarMunicipios(this.value);
+        });
     }
+    if (selectMunicipio) {
+        selectMunicipio.addEventListener("change", function () {
+            cargarCorregimientos(this.value);
+        });
+    }
+
+    // =========================
+    // INICIALIZACIÓN AL CARGAR PÁGINA (EDICIÓN)
+    // =========================
+    if (selectDepartamento && selectDepartamento.value) {
+        cargarMunicipios(selectDepartamento.value, municipioSeleccionado);
+    } else {
+        if (selectMunicipio) {
+            selectMunicipio.innerHTML = "<option>Seleccione un departamento</option>";
+            selectMunicipio.disabled = true;
+        }
+        if (selectCorreg) {
+            selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
+            selectCorreg.disabled = true;
+        }
+    }
+
 });
 </script>
 
