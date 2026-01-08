@@ -2,341 +2,251 @@
 {% block title %}Gestión de Personas{% endblock %}
 
 {% block content %}
+<style>
+    /* Ajustes de densidad y visualización */
+    .row-lider {
+        background-color: rgba(13, 110, 253, 0.03) !important;
+        border-left: 4px solid #0d6efd !important;
+    }
+    .text-xsmall { font-size: 0.72rem; line-height: 1.2; }
+    .table td, .table th { padding: 0.6rem 0.5rem; } /* Reduce padding lateral */
+    .font-monospace { font-size: 0.85rem; }
+    
+    /* Forzar que el contenido no se desborde */
+    .table-container {
+        overflow-x: hidden; /* Evita el scroll horizontal */
+        border-radius: 15px;
+        border: 1px solid #eee;
+    }
+    .content-wrapper { font-size: 0.88rem; } /* Reduce ligeramente la fuente general */
+</style>
 
-<div class="row justify-content-center">
+<div class="row justify-content-center content-wrapper">
     <div class="col-12">
-        
         <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-            {% include 'partials/messages.html' %}
+            <div class="card-body p-3 p-md-4">
+                {% include 'partials/messages.html' %}
 
-            <div class="row g-3 align-items-center mb-3">
-                
-                <div class="col-md-6">
-                    <h2 class="h4 mb-0 fw-bold" style="color: var(--color-text);">
-                        Gestión de Personas
-                    </h2>
-                </div>
-
-                <div class="col-md-6 text-md-end">
-                    <div class="d-inline-flex gap-2">
-                        {% if perms.appformulario.export_excel_votante %}
-                        <a href="{% url 'exportar_votantes' %}" class="btn btn-success rounded-pill px-3 shadow-sm text-white">
-                            <i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel
-                        </a>
-                        {% endif %}
-                        
-                        {% if perms.appformulario.add_votante %}
-                        <a href="{% url 'crear_votante' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                            <i class="bi bi-person-plus me-2"></i>Agregar
-                        </a>
-                        {% endif %}
+                <div class="row g-3 align-items-center mb-4">
+                    <div class="col-md-6">
+                        <h2 class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--color-text);">
+                            <span class="bg-success text-white p-2 rounded-3 me-2">
+                                <i class="bi bi-people-fill"></i>
+                            </span>
+                            Gestión de Personas
+                        </h2>
                     </div>
-                </div>
-            </div>
-
-            <div class="row g-3 align-items-center mb-4 pb-2 border-bottom">
-                
-                <div class="col-md-4">
-                    <form method="get" action="" class="d-flex align-items-center gap-2">
-                        <div class="input-group flex-grow-1">
-                            <input type="text" name="q" class="form-control rounded-start-pill"
-                                placeholder="Busca por nombre o cédula..."
-                                value="{{ query|default:'' }}">
-                            
-                            <button type="submit" class="btn btn-secondary" title="Buscar">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                        
-                        {% if query %}
-                            <a href="{% url 'lista_votantes' %}?status={{ status_filter|default:'' }}" 
-                            class="btn btn-outline-secondary rounded-circle" 
-                            title="Limpiar búsqueda" 
-                            style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-x-lg"></i>
+                    <div class="col-md-6 text-md-end">
+                        <div class="d-inline-flex gap-2">
+                            {% if perms.appformulario.export_excel_votante %}
+                            <a href="{% url 'exportar_votantes' %}" class="btn btn-outline-success rounded-pill px-3 fw-bold">
+                                <i class="bi bi-file-earmark-excel me-1"></i>Excel
                             </a>
-                        {% endif %}
-                    </form>
-                </div>
-                
-                <div class="col-md-3">
-                    </div>
-
-                <div class="col-md-5 d-flex justify-content-end">
-                    <!-- <span class="small text-muted mb-1 d-none d-md-block">Filtrar por rol:</span> -->
-                    <div class="btn-group" role="group" aria-label="Filtro de Rol">
-                        
-                        {# Enlaces de filtro de Rol. Importante: mantienen query (q) y status #}
-                        
-                        <a href="{% url 'lista_votantes' %}?{% if query %}q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
-                        class="btn btn-sm {% if not rol_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}" title="Mostrar Todos los Roles">
-                            Todos
-                        </a>
-                        
-                        <a href="{% url 'lista_votantes' %}?rol=VOTANTE{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
-                        class="btn btn-sm {% if rol_filter == 'VOTANTE' %}btn-dark{% else %}btn-outline-info{% endif %}" title="Mostrar solo Votantes">
-                            Votantes
-                        </a>
-                        
-                        <a href="{% url 'lista_votantes' %}?rol=LIDER_VOTANTE{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
-                        class="btn btn-sm {% if rol_filter == 'LIDER_VOTANTE' %}btn-dark{% else %}btn-outline-primary{% endif %}" title="Mostrar solo Líderes">
-                            Líderes
-                        </a>
+                            {% endif %}
+                            {% if perms.appformulario.add_votante %}
+                            <a href="{% url 'crear_votante' %}" class="btn btn-primary rounded-pill px-3 fw-bold">
+                                <i class="bi bi-person-plus me-1"></i>Agregar
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
-                <!-- <div class="col-md-5 d-flex justify-content-end">
-                    <span class="small text-muted me-2 mt-1 d-none d-md-block">Filtrar por estado:</span>
-                    
-                    <div class="btn-group" role="group" aria-label="Filtro de Estado">
-                        
-                        <a href="{% url 'lista_votantes' %}?q={{ query|default:'' }}" 
-                        class="btn btn-sm {% if not status_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}">
-                            Todos
-                        </a>
-                        
-                        <a href="{% url 'lista_votantes' %}?status=ACTIVE{% if query %}&q={{ query }}{% endif %}" 
-                        class="btn btn-sm {% if status_filter == 'ACTIVE' %}btn-dark{% else %}btn-outline-success{% endif %}">
-                            Activos
-                        </a>
-                        
-                        <a href="{% url 'lista_votantes' %}?status=INACTIVE{% if query %}&q={{ query }}{% endif %}" 
-                        class="btn btn-sm {% if status_filter == 'INACTIVE' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
-                            Inactivos
-                        </a>
+                <form method="get" action="" class="row g-2 align-items-end mb-4 pb-3 border-bottom">
+                    <div class="col-md-3">
+                        <label class="form-label text-xsmall fw-bolder text-secondary text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                            <i class="bi bi-search me-1"></i> Buscar Registro
+                        </label>
+                        <div class="input-group input-group-sm border-0 shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-0 py-2 ps-3">
+                                <i class="bi bi-search text-success"></i>
+                            </span>
+                            <input type="text" name="q" 
+                                class="form-control bg-light border-0 py-2 ps-2 text-dark" 
+                                placeholder="Nombre o cédula..." 
+                                value="{{ query|default:'' }}"
+                                style="outline: none; box-shadow: none;">
+                        </div>
                     </div>
-                </div> -->
-            </div>
-                
-                <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
-                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Rol</th>
-                                <th class="py-3 ps-4 text-uppercase text-secondary small fw-bold border-0 text-center">Nombres</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Apellidos</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Cédula</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Lugar de residencia</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Dirección de residencia</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Barrio de residencia</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Teléfono</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Líder</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Puesto de votación</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Mesa (N°)</th>
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Dirección</th> 
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Municipio/Corregimiento</th>                                    
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Departamento</th>                                    
-                                <th class="py-3 text-uppercase text-secondary small fw-bold border-0 text-center">Estado</th>
-                                <th class="py-3 pe-4 text-end text-uppercase text-secondary small fw-bold border-0 text-center">Acciones</th>
+
+                    <div class="col-md-3">
+                        <label class="form-label text-xsmall fw-bolder text-secondary text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                            <i class="bi bi-filter-circle me-1"></i> Filtrar por Líder
+                        </label>
+                        <div class="input-group input-group-sm border-0 shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-0 py-2 ps-3">
+                                <i class="bi bi-person-badge text-success"></i>
+                            </span>
+                            <select name="lider" 
+                                    class="form-select bg-light border-0 py-2 ps-2 text-dark" 
+                                    onchange="this.form.submit()"
+                                    style="outline: none; box-shadow: none; cursor: pointer;">
+                                <option value="">Todos los líderes</option>
+                                {% for lider in lideres %}
+                                    <option value="{{ lider.id }}" {% if lider_filter == lider.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ lider.nombre }} {{ lider.apellido }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                                        <div class="col-md-4">
+                        <label class="form-label text-xsmall fw-bolder text-secondary text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                            <i class="bi bi-layers me-1"></i> Filtrar por Rol
+                        </label>
+                        <div class="p-1 bg-light rounded-3 shadow-sm d-flex align-items-center" style="height: 38px;">
+                            <div class="btn-group btn-group-sm w-100" role="group">
+                                <input type="radio" class="btn-check" name="rol" value="" id="rol_all" onchange="this.form.submit()" {% if not rol_filter %}checked{% endif %}>
+                                <label class="btn btn-sm btn-outline-dark border-0 rounded-2 fw-bold py-1" for="rol_all">Todos</label>
+
+                                <input type="radio" class="btn-check" name="rol" value="VOTANTE" id="rol_v" onchange="this.form.submit()" {% if rol_filter == 'VOTANTE' %}checked{% endif %}>
+                                <label class="btn btn-sm btn-outline-success border-0 rounded-2 fw-bold py-1" for="rol_v">Votantes</label>
+
+                                <input type="radio" class="btn-check" name="rol" value="LIDER_VOTANTE" id="rol_l" onchange="this.form.submit()" {% if rol_filter == 'LIDER_VOTANTE' %}checked{% endif %}>
+                                <label class="btn btn-sm btn-outline-primary border-0 rounded-2 fw-bold py-1" for="rol_l">Líderes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label text-xsmall fw-bolder text-transparent mb-2 d-none d-md-block">&nbsp;</label>
+                        <div class="d-flex align-items-center h-100">
+                            {% if query or lider_filter or rol_filter %}
+                                <a href="{% url 'lista_votantes' %}" 
+                                class="btn btn-sm btn-white border-0 text-danger fw-bold d-flex align-items-center px-2 py-2 hover-shadow-sm transition-all"
+                                style="font-size: 0.75rem; background: rgba(220, 53, 69, 0.05); border-radius: 8px;">
+                                    <i class="bi bi-trash3-fill me-2"></i> LIMPIAR FILTROS
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="status" value="{{ status_filter|default:'' }}">
+                </form>
+
+                <div class="table-container">
+                    <table class="table table-hover align-middle mb-0" style="table-layout: fixed; width: 100%;">
+                        <thead class="table-light">
+                            <tr class="text-uppercase text-secondary text-xsmall fw-bolder">
+                                <th style="width: 100px;" class="text-center px-2">Rol/Estado</th>
+                                <th style="width: 200px;">Persona</th>
+                                <th style="width: 220px;">Residencia</th>
+                                <th style="width: 220px;">Votación</th>
+                                <th style="width: 80px;" class="text-center">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody class="border-top-0">
+                        <tbody>
                             {% for v in votantes %}
-                            <tr>
-                                <td class="text-center">
+                            <tr class="{% if v.rol == 'LIDER_VOTANTE' %}row-lider{% endif %}">
+                                <td class="text-center px-1">
                                     {% if v.rol == "LIDER_VOTANTE" %}
-                                        <span class="badge bg-primary text-white rounded-pill fw-normal">
-                                            {{ v.get_rol_display }}
-                                        </span>
+                                        <span class="badge bg-primary rounded-pill text-xsmall mb-1">LÍDER</span>
                                     {% else %}
-                                        <span class="badge bg-info text-dark rounded-pill fw-normal">
-                                            {{ v.get_rol_display }}
-                                        </span>
+                                        <span class="badge bg-success text-white rounded-pill text-xsmall mb-1">VOTANTE</span>
                                     {% endif %}
-                                </td>
-                                <td class="ps-4 text-center">{{ v.nombre }}</td>
-                                <td class="text-center">{{ v.apellido }}</td>
-                                <td class="font-monospace text-center">{{ v.cedula }}</td>
-                                <!-- MUNICIPIO / CORREGIMIENTO DE RESIDENCIA -->
-                                <td class="text-center">
-                                    {% if v.corregimiento_residencia %}
-                                        {{ v.corregimiento_residencia.nombre }}
-                                    {% else %}
-                                        {{ v.municipio_residencia.nombre }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">{{ v.direccion_residencia|default:"—"}}</td>
-                                <td class="text-center">{{ v.barrio_residencia|default:"—"}}</td>
-                                <td class="text-center">{{ v.telefono|default:"—" }}</td>
-
-                                <!-- NOMBRE DEL LIDER -->
-                                <td class="text-center">
-                                    {% if v.lider_asignado %}
-                                        {{ v.lider_asignado.nombre }} {{ v.lider_asignado.apellido }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- NOMBRE DEL PUESTO -->
-                                <td class="text-center">
-                                    {% if v.mesa and v.mesa.puesto_votacion %}
-                                        {{ v.mesa.puesto_votacion.nombre_lugar }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                
-                                <!-- MESA: solo número -->
-                                <td class="text-center">
-                                    {% if v.mesa %}
-                                        {{ v.mesa.numero }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- DIRECCIÓN DEL PUESTO -->
-                                <td class="text-center">
-                                    {% if v.mesa and v.mesa.puesto_votacion %}
-                                        {{ v.mesa.puesto_votacion.direccion|default:"—" }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- MUNICIPIO DEL PUESTO -->
-                                <td class="text-center">
-                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio %}
-                                        {{ v.mesa.puesto_votacion.municipio.nombre }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <!-- DEPARTAMENTO -->
-                                <td class="text-center">
-                                    {% if v.mesa and v.mesa.puesto_votacion and v.mesa.puesto_votacion.municipio and v.mesa.puesto_votacion.municipio.departamento %}
-                                        {{ v.mesa.puesto_votacion.municipio.departamento.nombre }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <td class="text-center">
-                                    {% if v.status == "ACTIVE" %}
-                                        <span class="badge bg-success text-white rounded-pill fw-normal">
-                                            {{ v.get_status_display }}
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-secondary text-white rounded-pill fw-normal">
-                                            {{ v.get_status_display }}
-                                        </span>
-                                    {% endif %}
-                                </td>
-
-                                <td class="text-center pe-4">
-                                    {% if perms.appformulario.change_votante %}
-                                    <a href="{% url 'editar_votante' v.id %}"                                      
-                                       class="btn btn-sm btn-outline-primary border-0 p-1"
-                                       title="Editar">
-                                        <i class="bi bi-pencil-square fs-5"></i>
-                                    </a>
-                                    {% endif %}
-
-                                    {% if perms.appformulario.change_status_votante %}
-                                        <!-- Botón de CAMBIAR ESTADO -->
+                                    <div class="text-xsmall">
                                         {% if v.status == "ACTIVE" %}
-                                            <a href="{% url 'cambiar_estado_votante' v.id %}" 
-                                            class="btn btn-sm btn-outline-secondary border-0 p-1"
-                                            onclick="return confirm('¿Seguro que deseas INACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
-                                            title="Inactivar">
-                                                <i class="bi bi-x-circle-fill fs-5"></i>
-                                            </a>
+                                            <span class="text-success fw-bold"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Activo</span>
                                         {% else %}
-                                            <a href="{% url 'cambiar_estado_votante' v.id %}" 
-                                            class="btn btn-sm btn-outline-success border-0 p-1" 
-                                            onclick="return confirm('¿Seguro que deseas REACTIVAR a {{ v.nombre }} {{ v.apellido }}?');"
-                                            title="Reactivar">
-                                                <i class="bi bi-check-circle-fill fs-5"></i>
-                                            </a>
+                                            <span class="text-secondary"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Inactivo</span>
                                         {% endif %}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="fw-bold text-truncate" title="{{ v.nombre }} {{ v.apellido }}">
+                                        {{ v.nombre }} {{ v.apellido }}
+                                    </div>
+                                    <div class="font-monospace text-muted text-xsmall">C.C. {{ v.cedula }}</div>
+                                    <div class="text-xsmall mt-1 text-primary">
+                                        <i class="bi bi-person-badge me-1"></i>{{ v.lider_asignado.nombre|default:"Sin Líder" }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="text-small fw-bold">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        {% if v.corregimiento_residencia %}{{ v.corregimiento_residencia.nombre }}{% else %}{{ v.municipio_residencia.nombre }}{% endif %}
+                                    </div>
+                                    <div class="text-xsmall text-muted text-truncate">
+                                        {{ v.direccion_residencia|default:"—" }} ({{ v.barrio_residencia|default:"—" }})
+                                    </div>
+                                    <div class="text-xsmall mt-1"><i class="bi bi-telephone me-1"></i>{{ v.telefono|default:"—" }}</div>
+                                </td>
+
+                                <td>
+                                    {% if v.mesa %}
+                                        <div class="text-small fw-bold text-truncate" title="{{ v.mesa.puesto_votacion.nombre_lugar }}">
+                                            {{ v.mesa.puesto_votacion.nombre_lugar }}
+                                        </div>
+                                        <div class="text-xsmall text-muted">
+                                            Mesa: <span class="badge bg-dark rounded-pill" style="font-size: 0.65rem;">{{ v.mesa.numero }}</span>
+                                        </div>
+                                        <div class="text-xsmall text-truncate mt-1">
+                                            {{ v.mesa.puesto_votacion.municipio.nombre }} | {{ v.mesa.puesto_votacion.municipio.departamento.nombre }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted text-xsmall">No asignado</span>
                                     {% endif %}
-                                    
-                                    <!-- {% if perms.appformulario.delete_votante %}
-                                    <a href="{% url 'eliminar_votante' v.id %}" 
-                                       class="btn btn-sm btn-outline-danger border-0 p-1"
-                                       onclick="return confirm('¿Seguro que deseas eliminar este votante?');"
-                                       title="Eliminar">
-                                        <i class="bi bi-trash fs-5"></i>
-                                    </a>
-                                    {% endif %} -->
+                                </td>
+
+                                <td class="text-center px-1">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        {% if perms.appformulario.change_votante %}
+                                        <a href="{% url 'editar_votante' v.id %}" 
+                                        class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center" 
+                                        style="width: 35px; height: 35px; transition: all 0.3s;"
+                                        title="Editar">
+                                            <i class="bi bi-pencil-square fs-5"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if perms.appformulario.change_status_votante %}
+                                            {% if v.status == 'ACTIVE' %}
+                                                <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                                class="btn btn-sm btn-outline-secondary border-0 rounded-circle d-flex align-items-center justify-content-center" 
+                                                style="width: 35px; height: 35px; transition: all 0.3s;"
+                                                onclick="return confirm('¿Desactivar a {{ v.nombre }}?');"
+                                                title="Desactivar">
+                                                    <i class="bi bi-person-x fs-5"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'cambiar_estado_votante' v.id %}" 
+                                                class="btn btn-sm btn-outline-success border-0 rounded-circle d-flex align-items-center justify-content-center" 
+                                                style="width: 35px; height: 35px; transition: all 0.3s;"
+                                                onclick="return confirm('¿Activar a {{ v.nombre }}?');"
+                                                title="Activar">
+                                                    <i class="bi bi-person-check fs-5"></i>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="9" class="text-center py-5 text-muted">
-                                    {% if query %}
-                                        <i class="bi bi-search display-6 d-block mb-3 opacity-25"></i>
-                                        No se encontraron resultados para "<strong>{{ query }}</strong>".
-                                        <br>
-                                        <a href="{% url 'lista_votantes' %}" class="text-decoration-none mt-2 d-inline-block">Limpiar búsqueda</a>
-                                    {% else %}
-                                        <i class="bi bi-people display-6 d-block mb-3 opacity-25"></i>
-                                        No hay votantes registrados aún.
-                                    {% endif %}
-                                </td>
+                                <td colspan="5" class="text-center py-5 text-muted">No hay resultados.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
-                <nav aria-label="Navegación de páginas" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        
+                {% if votantes.has_other_pages %}
+                <nav class="mt-3">
+                    <ul class="pagination pagination-sm justify-content-center">
                         {% if votantes.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Primera">
-                                    <span aria-hidden="true">&laquo;&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ votantes.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Anterior">
-                                    &laquo;
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled"><span class="page-link">&laquo;&laquo;</span></li>
-                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                            <li class="page-item"><a class="page-link border-0 rounded-pill mx-1" href="?page={{ votantes.previous_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">Anterior</a></li>
                         {% endif %}
-
-                        <li class="page-item disabled">
-                            <span class="page-link text-dark">
-                                Página {{ votantes.number }} de {{ votantes.paginator.num_pages }}
-                            </span>
-                        </li>
-
+                        <li class="page-item active"><span class="page-link border-0 rounded-pill mx-1 shadow-sm">{{ votantes.number }}</span></li>
                         {% if votantes.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ votantes.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Siguiente">
-                                    &raquo;
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ votantes.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Última">
-                                    <span aria-hidden="true">&raquo;&raquo;</span>
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                            <li class="page-item disabled"><span class="page-link">&raquo;&raquo;</span></li>
+                            <li class="page-item"><a class="page-link border-0 rounded-pill mx-1" href="?page={{ votantes.next_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">Siguiente</a></li>
                         {% endif %}
                     </ul>
                 </nav>
-
+                {% endif %}
             </div>
         </div>
-
-        <!-- <div class="mt-3 ms-2">
-            <a href="/" class="text-decoration-none text-muted small hover-link">
-                <i class="bi bi-arrow-left me-1"></i> Volver 
-            </a>
-        </div> -->
-
     </div>
 </div>
-
 {% endblock %}

@@ -9,6 +9,7 @@ class PuestoVotacionAdminForm(forms.ModelForm):
     cantidad_mesas = forms.IntegerField(
         label="Cantidad de mesas",
         min_value=1,
+        required=False,
         help_text="Número de mesas que tendrá este puesto"
     )
 
@@ -119,14 +120,14 @@ class PuestoVotacionAdmin(admin.ModelAdmin):
             super().save_model(request, obj, form, change)
 
             if not change:
-                cantidad = form.cleaned_data['cantidad_mesas']
-
-                Mesa.objects.bulk_create([
-                    Mesa(
-                        puesto_votacion=obj,
-                        numero=i + 1
-                    )
-                    for i in range(cantidad)
-                ])
+                cantidad = form.cleaned_data.get('cantidad_mesas')
+                if cantidad:
+                    Mesa.objects.bulk_create([
+                        Mesa(
+                            puesto_votacion=obj,
+                            numero=i + 1
+                        )
+                        for i in range(cantidad)
+                    ])
 
 admin.site.register(PuestoVotacion, PuestoVotacionAdmin)

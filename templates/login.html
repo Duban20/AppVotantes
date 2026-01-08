@@ -1,46 +1,173 @@
 {% extends "base.html" %} 
 {% load static %}
 
-{% block title %}Iniciar Sesión{% endblock %}
+{% block title %}Iniciar Sesión | Sistema Electoral{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
+<style>
+    .login-card {
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    .login-icon-box {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(145deg, #ffffff, #f1f5f9);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+    }
+
+    .form-control-custom {
+        background-color: #f8fafc !important;
+        border: 2px solid transparent !important;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    /* Ajuste para que el texto no se pegue al icono del ojo */
+    .input-password-container {
+        position: relative;
+    }
+    
+    .input-password-container .form-control-custom {
+        padding-right: 45px;
+    }
+
+    .form-control-custom:focus {
+        background-color: #fff !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1) !important;
+        outline: none;
+    }
+
+    /* Botón del ojo */
+    .btn-toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        padding: 5px;
+        z-index: 10;
+        transition: color 0.2s;
+    }
+
+    .btn-toggle-password:hover {
+        color: #0d6efd;
+    }
+
+    .btn-login-submit {
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 700;
+        background-color: #0f172a;
+        border: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-login-submit:hover {
+        background-color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Forzar que el enfoque sea verde */
+    .form-control-custom:focus {
+        background-color: #fff !important;
+        border-color: #198754 !important; /* Verde success oficial de Bootstrap */
+        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.1) !important; /* Brillo verde sutil */
+        outline: none;
+    }
+</style>
+
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
     <div class="col-md-6 col-lg-5 col-xl-4">
-        <div class="card border-0 shadow-sm p-4 mt-1">
-            <h3 class="text-center mb-4" style="color: var(--color-text);">
-                Bienvenido
-            </h3>
-            <p class="text-center text-muted mb-4">
-                Usa tus credenciales para acceder al sistema.
-            </p>
+        <div class="card login-card p-4 p-md-5">
+            
+            <div class="text-center">
+                <div class="login-icon-box">
+                    <i class="bi bi-shield-lock-fill text-success" style="font-size: 1.8rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.5px;">Bienvenido</h3>
+                <p class="text-muted small mb-4">Ingresa tus credenciales para continuar</p>
+            </div>
 
             {% if form.errors %}
-                <div class="alert alert-danger" role="alert">
-                    Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.
+                <div class="alert alert-danger border-0 small rounded-3 d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Usuario o contraseña incorrectos.
                 </div>
             {% endif %}
 
             <form method="post" action=""> 
                 {% csrf_token %}
-
                 <input type="hidden" name="next" value="{{ next }}">
 
                 <div class="mb-3">
-                    <label for="id_username" class="form-label small fw-bold">Usuario</label>
-                    <input type="text" name="username" autofocus required id="id_username" class="form-control form-control-lg">
+                    <label for="id_username" class="form-label text-xsmall fw-bolder text-secondary text-uppercase ms-1" style="letter-spacing: 0.5px;">
+                        Usuario
+                    </label>
+                    <input type="text" name="username" autofocus required id="id_username" 
+                           class="form-control form-control-custom" 
+                           placeholder="nombre_usuario">
                 </div>
                 
                 <div class="mb-4">
-                    <label for="id_password" class="form-label small fw-bold">Contraseña</label>
-                    <input type="password" name="password" required id="id_password" class="form-control form-control-lg">
+                    <label for="id_password" class="form-label text-xsmall fw-bolder text-secondary text-uppercase ms-1" style="letter-spacing: 0.5px;">
+                        Contraseña
+                    </label>
+                    <div class="input-password-container">
+                        <input type="password" name="password" required id="id_password" 
+                               class="form-control form-control-custom" 
+                               placeholder="••••••••">
+                        <button type="button" class="btn-toggle-password" id="togglePassword">
+                            <i class="bi bi-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-dark btn-lg w-100" 
-                        style="background-color: var(--color-text);">
-                    <i class="bi bi-box-arrow-in-right me-2"></i> Entrar
+                <button type="submit" class="btn btn-dark btn-login-submit w-100 mb-3">
+                    <span>Entrar al Sistema</span>
+                    <i class="bi bi-arrow-right-short ms-1" style="font-size: 1.2rem;"></i>
                 </button>
+
+                <!-- <div class="text-center">
+                    <a href="#" class="text-decoration-none small text-muted">¿Olvidaste tu contraseña?</a>
+                </div> -->
             </form>
         </div>
+        
+        <!-- <p class="text-center mt-4 text-muted small opacity-50">
+            &copy; 2026 Plataforma de Gestión Electoral
+        </p> -->
     </div>
 </div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#id_password');
+    const eyeIcon = document.querySelector('#eyeIcon');
+
+    togglePassword.addEventListener('click', function (e) {
+        // Alternar el tipo de input
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Alternar el icono
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
+    });
+</script>
 {% endblock %}

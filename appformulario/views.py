@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 from AppMunicipio.models import Municipio
+from AppPuestoVotacion.models import PuestoVotacion
 from appcorregimientos.models import Corregimiento
 
 from .forms import VotanteForm
@@ -25,6 +26,7 @@ def lista_votantes(request):
     query = request.GET.get('q')
     status_filter = request.GET.get('status')
     rol_filter = request.GET.get('rol')
+    lider_filter = request.GET.get('lider') 
     
     # Es importante ordenar los resultados para que la paginación sea consistente
     votantes_list = Votante.objects.all().order_by('-id') # O por 'apellido'
@@ -36,6 +38,9 @@ def lista_votantes(request):
     # Aplicar el filtro de rol si existe
     if rol_filter:
         votantes_list = votantes_list.filter(rol=rol_filter)
+
+    if lider_filter:
+        votantes_list = votantes_list.filter(lider_asignado_id=lider_filter)
     
     # Aplicar el filtro de búsqueda general (q)
     if query:
@@ -45,6 +50,12 @@ def lista_votantes(request):
             Q(cedula__icontains=query) |
             Q(puesto_votacion__nombre_lugar__icontains=query)
         )
+
+
+    lideres = Votante.objects.filter(
+        rol='LIDER_VOTANTE',
+        votantes_asignados__isnull=False
+    ).distinct()
     
     # --- LÓGICA DE PAGINACIÓN ---
     paginator = Paginator(votantes_list, 10) # Muestra 10 votantes por página
@@ -55,7 +66,9 @@ def lista_votantes(request):
         'votantes': page_obj, # Ahora pasamos el objeto paginado
         'query': query,
         'status_filter': status_filter,
-        'rol_filter': rol_filter
+        'rol_filter': rol_filter,
+        'lider_filter': lider_filter,
+        'lideres': lideres,
     })
 
 @login_required
@@ -160,6 +173,30 @@ def obtener_municipios_por_departamento(request):
 
     return JsonResponse({"municipios": data})
 
+# views.py
+
+@login_required
+def obtener_puestos_por_ubicacion(request):
+    municipio_id = request.GET.get("municipio_id")
+    corregimiento_id = request.GET.get("corregimiento_id")
+    
+    puestos = PuestoVotacion.objects.filter(status="ACTIVE")
+
+    if corregimiento_id:
+        puestos = puestos.filter(corregimiento_id=corregimiento_id)
+    elif municipio_id:
+        puestos = puestos.filter(municipio_id=municipio_id)
+
+    data = [
+        {
+            "id": p.id, 
+            "nombre": p.nombre_lugar,
+            "direccion": p.direccion,
+            "municipio": p.municipio.nombre,
+            "departamento": p.municipio.departamento.nombre
+        } for p in puestos
+    ]
+    return JsonResponse({"puestos": data})
 
 
 # -----------------------------------------------------------------------

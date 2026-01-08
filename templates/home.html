@@ -1,59 +1,142 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Gestión Electoral{% endblock %}
+{% block title %}Gestión Electoral | Selección de Rol{% endblock %}
 
 {% block content %}
+<style>
+    /* Efecto de fondo sutil para la landing */
+    .landing-wrapper {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
-<!-- Contenedor principal centrado verticalmente para evitar scroll -->
-<div class="d-flex flex-column justify-content-center align-items-center" 
-     style="height: 70vh; min-height: 500px; margin-top: -20px;">
+    /* Tarjetas de Rol Estilizadas */
+    .card-role-premium {
+        border-radius: 28px;
+        background: #ffffff;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-role-premium:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
+        border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    /* Contenedores de Iconos */
+    .icon-shape {
+        width: 75px;
+        height: 75px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .card-role-premium:hover .icon-shape {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .bg-admin {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        color: #fff;
+    }
+
+    .bg-digitador {
+        background: linear-gradient(145deg, #10b981, #059669);
+        color: #fff;
+    }
+
+    /* Botones personalizados dentro de las cards */
+    .btn-role {
+        border-radius: 14px;
+        padding: 12px 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .title-highlight {
+        color: #059669; /* Verde Esmeralda */
+        position: relative;
+        display: inline-block;
+    }
+
+    .title-highlight::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 8px;
+        background: rgba(16, 185, 129, 0.1);
+        bottom: 8px;
+        left: 0;
+        z-index: -1;
+    }
+</style>
+
+<div class="landing-wrapper container">
     
-    <!-- Sección de Encabezado -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-success mb-3">Gestión de Votantes Equipo Guajira</h1>
-        <div class="col-lg-8 mx-auto">
-            <p class="text-muted mb-0 lead">
-                Plataforma centralizada para el registro, gestión de votantes y líderes.
-                Seleccione su rol para continuar.
+        <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 mb-3 fw-bold">
+            <i class="bi bi-geo-alt-fill me-1"></i> EQUIPO GUAJIRA
+        </span>
+        <h1 class="display-5 fw-black text-dark mb-3" style="font-weight: 900; letter-spacing: -1.5px;">
+            Gestión <span class="title-highlight">Electoral</span>
+        </h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="text-muted lead fs-6">
+                Acceso centralizado para el monitoreo y registro de la estructura. 
+                Por favor, elige tu nivel de acceso.
             </p>
         </div>
     </div>
 
-    <!-- Sección de Selección de Roles -->
     <div class="row justify-content-center w-100 g-4">
         
-        <!-- Tarjeta Administrador -->
-        <div class="col-md-5 col-lg-4 col-xl-3">
-            <a href="/admin" class="text-decoration-none">
-                <div class="card border-0 shadow-sm h-100 card-role card-hover-up">
-                    <div class="card-body p-4 text-center">
-                        <div class="icon-circle bg-dark text-white mb-3 mx-auto shadow-sm">
-                            <i class="bi bi-shield-lock-fill fs-2"></i>
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="/admin" class="text-decoration-none h-100 d-block">
+                <div class="card border-0 shadow-sm h-100 card-role-premium p-4">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="icon-shape bg-admin shadow">
+                            <i class="bi bi-shield-lock-fill" style="font-size: 2rem;"></i>
                         </div>
-                        <h4 class="card-title fw-bold text-dark">Administrador</h4>
-                        <p class="card-text text-muted small mt-2 mb-4">
-                            Configuración total, gestión de usuarios y auditoría del sistema.
+                        <h4 class="fw-bold text-dark mb-2">Administrador</h4>
+                        <p class="text-muted small flex-grow-1">
+                            Control total de la plataforma, auditoría y gestión de usuarios del sistema.
                         </p>
-                        <span class="btn btn-dark rounded-pill px-4 w-100">Ingresar al Panel</span>
+                        <div class="btn btn-dark btn-role w-100 mt-3 shadow-sm">
+                            Acceso Total <i class="bi bi-arrow-right-short ms-1"></i>
+                        </div>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Tarjeta Trabajador -->
-        <div class="col-md-5 col-lg-4 col-xl-3">
-            <a href="/dashboard" class="text-decoration-none">
-                <div class="card border-0 shadow-sm h-100 card-role card-hover-up">
-                    <div class="card-body p-4 text-center">
-                        <div class="icon-circle bg-success text-white mb-3 mx-auto shadow-sm">
-                            <i class="bi bi-person-badge-fill fs-2"></i>
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="/dashboard" class="text-decoration-none h-100 d-block">
+                <div class="card border-0 shadow-sm h-100 card-role-premium p-4">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="icon-shape bg-digitador shadow">
+                            <i class="bi bi-pencil-square" style="font-size: 2rem;"></i>
                         </div>
-                        <h4 class="card-title fw-bold text-success">Digitadores</h4>
-                        <p class="card-text text-muted small mt-2 mb-4">
-                            Registro de votantes, líderes, puestos de votación y consulta de datos.
+                        <h4 class="fw-bold text-success mb-2">Digitador</h4>
+                        <p class="text-muted small flex-grow-1">
+                            Registro de votantes, organización de líderes y consulta de puestos locales.
                         </p>
-                        <span class="btn btn-success rounded-pill px-4 w-100">Gestionar Registros</span>
+                        <div class="btn btn-success btn-role w-100 mt-3 shadow-sm" style="background-color: #059669; border: none;">
+                            Gestión Operativa <i class="bi bi-arrow-right-short ms-1"></i>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -61,41 +144,10 @@
 
     </div>
 
+    <!-- <div class="mt-5 text-center">
+        <p class="text-muted xsmall opacity-50">
+            Soporte Técnico: soporte@equipoguajira.com
+        </p>
+    </div> -->
 </div>
-
-<style>
-    .icon-circle {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .card-role {
-        transition: all 0.3s ease;
-        border-radius: 1rem;
-    }
-
-    .card-hover-up:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.15)!important;
-    }
-
-    .card-hover-up:hover .btn-primary {
-        background-color: #0b5ed7;
-        transform: scale(1.02);
-    }
-    
-    .card-hover-up:hover .btn-dark {
-        background-color: #212529;
-        transform: scale(1.02);
-    }
-    
-    .btn {
-        transition: transform 0.2s;
-    }
-</style>
-
 {% endblock %}

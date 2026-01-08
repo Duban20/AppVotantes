@@ -2,26 +2,20 @@
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-
 <div class="row justify-content-center">
-    <div class="col-lg-8"> 
+    <div class="col-lg-10">
         <div class="card border-0 shadow-sm">
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body p-4">
 
-                <div class="text-center mb-5">
-                    <h2 class="h3 fw-bold" style="color: var(--color-text);">
-                        {{ titulo }}
-                    </h2>
-                    <p class="text-muted">
-                        Complete la información del votante a continuación.
-                    </p>
+                <div class="text-center mb-4">
+                    <h2 class="h4 fw-bold" style="color: var(--color-text);">{{ titulo }}</h2>
+                    <p class="text-muted small">Complete la información del votante a continuación.</p>
                 </div>
 
                 <form method="post">
                     {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Errores del formulario:</strong>
-                        <ul class="mt-2">
+                    <div class="alert alert-danger py-2">
+                        <ul class="mb-0 small">
                             {% for field, errors in form.errors.items %}
                                 <li><strong>{{ field }}:</strong> {{ errors.0 }}</li>
                             {% endfor %}
@@ -31,495 +25,336 @@
 
                     {% csrf_token %}
 
-                    <!-- ============================= -->
-                    <!--   SECCIÓN 1: DATOS PERSONALES -->
-                    <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-success">Datos Personales</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <h6 class="fw-bold mb-0 text-success text-uppercase" style="letter-spacing: 1px;">Datos Personales</h6>
+                        <div class="flex-grow-1 ms-3 border-bottom opacity-25"></div>
+                    </div>
 
-                    <div class="row">
-
-                        <!-- ROL -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Rol</label>
-                            {{ form.rol }}
-                            {% if form.rol.errors %}
-                                <div class="text-danger small">{{ form.rol.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- NOMBRES -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Nombres</label>
-                            {{ form.nombre }}
-                            {% if form.nombre.errors %}
-                                <div class="text-danger small">{{ form.nombre.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- APELLIDOS -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Apellidos</label>
-                            {{ form.apellido }}
-                            {% if form.apellido.errors %}
-                                <div class="text-danger small">{{ form.apellido.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- CÉDULA -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Cédula</label>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Cédula</label>
                             {{ form.cedula }}
-                            {% if form.cedula.errors %}
-                                <div class="text-danger small">{{ form.cedula.errors.0 }}</div>
-                            {% endif %}
                         </div>
-
-                        <!-- TELÉFONO -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Teléfono</label>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Rol</label>
+                            {{ form.rol }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Teléfono</label>
                             {{ form.telefono }}
-                            {% if form.telefono.errors %}
-                                <div class="text-danger small">{{ form.telefono.errors.0 }}</div>
-                            {% endif %}
                         </div>
-
-                        <!-- DIRECCIÓN -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Dirección de residencia</label>
-                            {{ form.direccion_residencia }}
-                            {% if form.direccion_residencia.errors %}
-                                <div class="text-danger small">{{ form.direccion_residencia.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- BARRIO -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Barrio de residencia</label>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Barrio</label>
                             {{ form.barrio_residencia }}
-                            {% if form.barrio_residencia.errors %}
-                                <div class="text-danger small">{{ form.barrio_residencia.errors.0 }}</div>
-                            {% endif %}
                         </div>
 
-                        <!-- DEPARTAMENTO -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Departamento de residencia</label>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary mb-1">Nombres</label>
+                            {{ form.nombre }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary mb-1">Apellidos</label>
+                            {{ form.apellido }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Departamento Residencia</label>
                             {{ form.departamento_residencia }}
                         </div>
-
-                        <!-- MUNICIPIO DE RESIDENCIA -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Municipio de residencia</label>
-                            {{ form.municipio_residencia }}
-                            {% if form.municipio_residencia.errors %}
-                                <div class="text-danger small">{{ form.municipio_residencia.errors.0 }}</div>
-                            {% endif %}
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Municipio Residencia</label>
+                            <select id="id_municipio_residencia" name="municipio_residencia" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento Residencia</label>
+                            <select id="id_corregimiento_residencia" name="corregimiento_residencia" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-secondary mb-1">Dirección de residencia</label>
+                            {{ form.direccion_residencia }}
+                        </div>
+                    </div>
 
-                        <!-- CORREGIMIENTO DE RESIDENCIA -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Corregimiento de residencia</label>
-                            <select id="id_corregimiento_residencia" name="corregimiento_residencia" class="form-select">
-                                <option value="">Seleccione (Solo si aplica)</option>
+                    <div class="d-flex align-items-center mb-3 mt-4">
+                        <h6 class="fw-bold mb-0 text-success text-uppercase" style="letter-spacing: 1px;">Asignación de Líder</h6>
+                        <div class="flex-grow-1 ms-3 border-bottom opacity-25"></div>
+                    </div>
 
-                                {% with selected=form.corregimiento_residencia.value %}
-                                    {% for correg in form.fields.corregimiento_residencia.queryset %}
-                                        <option 
-                                            value="{{ correg.id }}"
-                                            {% if selected|stringformat:"s" == correg.id|stringformat:"s" %}selected{% endif %}
-                                        >
-                                            {{ correg.nombre }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary mb-1">Líder responsable</label>
+                            <select id="id_lider_asignado" name="lider_asignado" class="form-select">
+                                <option value="">Sin líder asignado</option>
+                                {% with selected=form.lider_asignado.value %}
+                                    {% for lider in form.fields.lider_asignado.queryset %}
+                                        <option value="{{ lider.id }}" data-cedula="{{ lider.cedula }}" data-telefono="{{ lider.telefono }}"
+                                            {% if selected|stringformat:"s" == lider.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ lider.nombre }} {{ lider.apellido }}
                                         </option>
                                     {% endfor %}
                                 {% endwith %}
                             </select>
-
-                            {% if form.corregimiento_residencia.errors %}
-                                <div class="text-danger small mt-1">{{ form.corregimiento_residencia.errors.0 }}</div>
-                            {% endif %}
                         </div>
-
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Ced. Líder</label>
+                            <input id="cedula_lider" class="form-control bg-light" readonly tabindex="-1">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Tel. Líder</label>
+                            <input id="telefono_lider" class="form-control bg-light" readonly tabindex="-1">
+                        </div>
                     </div>
 
-                    <hr class="my-4">
-
-                    <!-- ============================= -->
-                    <!--       SECCIÓN 2: LÍDER        -->
-                    <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-success">Líder</h5>
-
-                    <div class="row">
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Seleccione el líder</label>
-
-                            <div class="input-group">
-                                <select id="id_lider_asignado" name="lider_asignado" class="form-select">
-                                    <option value="">Seleccione un líder</option>
-
-                                    {% with selected=form.lider_asignado.value %}
-                                        {% for lider in form.fields.lider_asignado.queryset %}
-                                            <option 
-                                                value="{{ lider.id }}"
-                                                data-cedula="{{ lider.cedula }}"
-                                                data-telefono="{{ lider.telefono }}"
-                                                {% if selected|stringformat:"s" == lider.id|stringformat:"s" %}selected{% endif %}
-                                            >
-                                                {{ lider.nombre }} {{ lider.apellido }}
-                                            </option>
-                                        {% endfor %}
-                                    {% endwith %}
-                                </select>
-                            </div>
-
-                            {% if form.lider_asignado.errors %}
-                                <div class="text-danger small mt-1">{{ form.lider_asignado.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Datos auto-rellenados -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Cédula del líder</label>
-                            <input id="cedula_lider" class="form-control" readonly>
-                        </div>
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Teléfono del líder</label>
-                            <input id="telefono_lider" class="form-control" readonly>
-                        </div>
-
+                    <div class="d-flex align-items-center mb-3 mt-4">
+                        <h6 class="fw-bold mb-0 text-success text-uppercase" style="letter-spacing: 1px;">Lugar de Votación</h6>
+                        <div class="flex-grow-1 ms-3 border-bottom opacity-25"></div>
                     </div>
 
-                    <hr class="my-4">
-
-                    <!-- ============================= -->
-                    <!--   SECCIÓN 3: PUESTO VOTACIÓN  -->
-                    <!-- ============================= -->
-                    <h5 class="fw-bold mb-3 text-success">Puesto de Votación</h5>
-
-                    <div class="row">
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Puesto de votación</label>
-                            <select id="id_puesto_votacion" name="puesto_votacion" class="form-select">
-                                <option value="">Seleccione un puesto</option>
-
-                                {% with selected=form.puesto_votacion.value %}
-                                    {% for puesto in form.fields.puesto_votacion.queryset %}
-                                        <option
-                                            value="{{ puesto.id }}"
-                                            data-direccion="{{ puesto.direccion }}"
-                                            data-municipio="{{ puesto.municipio.nombre }}"
-                                            data-departamento="{{ puesto.municipio.departamento.nombre }}"
-                                            {% if selected|stringformat:"s" == puesto.id|stringformat:"s" %}selected{% endif %}
-                                        >
-                                            {{ puesto.nombre_lugar }}
-                                        </option>
-                                    {% endfor %}
-                                {% endwith %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Depto. Puesto</label>
+                            <select id="id_dept_puesto_filtro" class="form-select">
+                                <option value="">Seleccione...</option>
+                                {% for dept in form.fields.departamento_residencia.queryset %}
+                                    <option value="{{ dept.id }}" {% if form.instance.puesto_votacion and form.instance.puesto_votacion.municipio.departamento.id == dept.id %}selected{% endif %}>
+                                        {{ dept.nombre }}
+                                    </option>
+                                {% endfor %}
                             </select>
-
-                            {% if form.puesto_votacion.errors %}
-                                <div class="text-danger small">{{ form.puesto_votacion.errors.0 }}</div>
-                            {% endif %}
                         </div>
-
-                        <!-- Mesa -->
-                        <div id="contenedor-mesa" class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Mesa</label>
-
-                            {{ form.mesa }}
-
-                            {% if form.mesa.errors %}
-                                <div class="text-danger small">{{ form.mesa.errors.0 }}</div>
-                            {% endif %}
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Muni. Puesto</label>
+                            <select id="id_muni_puesto_filtro" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
-
-                        <!-- Datos auto-rellenados -->
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Dirección</label>
-                            <input id="direccion_puesto" class="form-control" readonly>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento Puesto</label>
+                            <select id="id_corre_puesto_filtro" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Municipio</label>
-                            <input id="municipio" class="form-control" readonly>
+                        <div class="col-md-9">
+                            <label class="form-label small fw-bold text-secondary mb-1">Puesto de Votación</label>
+                            <select id="id_puesto_votacion" name="puesto_votacion" class="form-select" disabled>
+                                <option value="">Seleccione una ubicación</option>
+                            </select>
                         </div>
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Departamento</label>
-                            <input id="departamento" class="form-control" readonly>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Mesa</label>
+                            <select id="id_mesa" name="mesa" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
-
                     </div>
 
-                    <!-- Buttons -->
-                    <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
-                        <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted">Cancelar</a>
-                        <button type="submit" class="btn btn-success rounded-pill px-5 py-2 shadow-sm">Guardar Datos</button>
+                    <div class="d-flex justify-content-end align-items-center gap-3 mt-5 pt-3 border-top">
+                        <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted small">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-5 shadow-sm fw-bold">Guardar Votante</button>
                     </div>
-
                 </form>
-
 
             </div>
         </div>
     </div>
 </div>
 
-<!-- ============================================ -->
-<!--   SCRIPT: LIDER, PUESTO, MESAS, DEPARTAMENTO, MUNICIPIO Y CORREGIMIENTO -->
-<!-- ============================================ -->
+<style>
+    .form-control, .form-select { border-color: #e9ecef; font-size: 0.9rem; padding: 0.5rem 0.75rem; }
+    .form-control:focus, .form-select:focus { border-color: #198754; box-shadow: none; }
+    .form-control[readonly] { background-color: #f8f9fa !important; border-color: #eee; color: #6c757d; }
+    .card { border-radius: 12px; }
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    // =========================
-    // SELECTORES DEL FORMULARIO
-    // =========================
-    const selectLider    = document.getElementById("id_lider_asignado");
-    const cedulaInput    = document.getElementById("cedula_lider");
-    const telefonoInput  = document.getElementById("telefono_lider");
+    // --- SELECTORES ---
+    const fDeptPuesto = document.getElementById("id_dept_puesto_filtro");
+    const fMuniPuesto = document.getElementById("id_muni_puesto_filtro");
+    const fCorrePuesto = document.getElementById("id_corre_puesto_filtro");
+    const selectPuesto = document.getElementById("id_puesto_votacion");
+    const selectMesa = document.getElementById("id_mesa");
 
-    const selectPuesto   = document.getElementById("id_puesto_votacion");
-    const selectMesa     = document.getElementById("id_mesa");
+    const selectDeptRes = document.getElementById("id_departamento_residencia");
+    const selectMuniRes = document.getElementById("id_municipio_residencia");
+    const selectCorrRes = document.getElementById("id_corregimiento_residencia");
 
-    const direccionInput  = document.getElementById("direccion_puesto");
-    const municipioInput  = document.getElementById("municipio");
-    const departamentoInput = document.getElementById("departamento");
+    const selectLider = document.getElementById("id_lider_asignado");
+    const cedulaInput = document.getElementById("cedula_lider");
+    const telefonoInput = document.getElementById("telefono_lider");
+    const roleSelect = document.querySelector("[name='rol']");
 
-    const roleSelect     = document.getElementById("id_rol");
-    const roleRadios     = document.querySelectorAll('input[name="rol"]');
+    // --- VALORES INICIALES (PARA EDICIÓN) ---
+    const initMuniResId = "{{ form.municipio_residencia.value|default:'' }}";
+    const initCorrResId = "{{ form.corregimiento_residencia.value|default:'' }}";
+    
+    const initPuestoId = "{{ form.puesto_votacion.value|default:'' }}";
+    const initMesaId   = "{{ form.mesa.value|default:'' }}";
+    const initMuniPuestoId = "{% if form.instance.puesto_votacion %}{{ form.instance.puesto_votacion.municipio.id }}{% endif %}";
+    const initCorrePuestoId = "{% if form.instance.puesto_votacion %}{{ form.instance.puesto_votacion.corregimiento.id|default:'' }}{% endif %}";
 
-    const selectDepartamento = document.getElementById("id_departamento_residencia");
-    const selectMunicipio    = document.getElementById("id_municipio_residencia");
-    const selectCorreg       = document.getElementById("id_corregimiento_residencia");
+    function resetSelect(el, text, disabled = true) {
+        if (!el) return;
+        el.innerHTML = `<option value="">${text}</option>`;
+        el.disabled = disabled;
+    }
 
-    // =========================
-    // VALORES GUARDADOS AL EDITAR
-    // =========================
-    const mesaSeleccionada     = "{{ form.mesa.value|default:'' }}";
-    const municipioSeleccionado  = "{{ form.municipio_residencia.value|default:'' }}";
-    const corregSeleccionado     = "{{ form.corregimiento_residencia.value|default:'' }}";
-
-    // =========================
-    // AUTORELLENAR DATOS DEL LIDER
-    // =========================
+    // ==========================================
+    // 1. LÓGICA LÍDER (MENSAJE, BLOQUEO Y AUTO-RELLENO)
+    // ==========================================
     function fillLiderFields() {
         if (!selectLider) return;
         const opt = selectLider.options[selectLider.selectedIndex];
-        if (opt && opt.value) {
-            cedulaInput.value = opt.dataset.cedula || "";
-            telefonoInput.value = opt.dataset.telefono || "";
-        } else {
-            cedulaInput.value = "";
-            telefonoInput.value = "";
-        }
-    }
-    if (selectLider) {
-        selectLider.addEventListener("change", fillLiderFields);
-        fillLiderFields(); // al cargar
+        cedulaInput.value = (opt && opt.value) ? (opt.dataset.cedula || "") : "";
+        telefonoInput.value = (opt && opt.value) ? (opt.dataset.telefono || "") : "";
     }
 
-    // =========================
-    // AUTORELLENAR DATOS DEL PUESTO
-    // =========================
-    function fillPuestoFields() {
-        if (!selectPuesto) return;
-        const opt = selectPuesto.options[selectPuesto.selectedIndex];
-        if (opt) {
-            direccionInput.value  = opt.dataset.direccion || "";
-            municipioInput.value  = opt.dataset.municipio || "";
-            departamentoInput.value = opt.dataset.departamento || "";
-        }
-    }
-    if (selectPuesto) {
-        selectPuesto.addEventListener("change", fillPuestoFields);
-        fillPuestoFields(); // al cargar
-    }
-
-    // =========================
-    // CARGAR MESAS SEGÚN EL PUESTO
-    // =========================
-    function cargarMesas(puestoId) {
-        if (!selectMesa) return;
-
-        if (!puestoId) {
-            selectMesa.innerHTML = "<option>Seleccione un puesto</option>";
-            selectMesa.disabled = true;
-            return;
-        }
-
-        fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
-            .then(res => res.json())
-            .then(data => {
-                selectMesa.innerHTML = '<option value="">Seleccione una mesa</option>';
-                selectMesa.disabled = false;
-                data.mesas.forEach(m => {
-                    const opt = document.createElement("option");
-                    opt.value = m.id;
-                    opt.textContent = "Mesa " + m.numero;
-                    if (mesaSeleccionada == m.id) opt.selected = true;
-                    selectMesa.appendChild(opt);
-                });
-            });
-    }
-    if (selectPuesto) {
-        selectPuesto.addEventListener("change", function() {
-            cargarMesas(this.value);
-        });
-        if (selectPuesto.value) cargarMesas(selectPuesto.value);
-        else {
-            selectMesa.innerHTML = "<option>Seleccione un puesto</option>";
-            selectMesa.disabled = true;
-        }
-    }
-
-    // =========================
-    // HABILITAR / DESHABILITAR SELECT DE LIDER SEGÚN ROL
-    // =========================
-    if (selectLider) {
-
-        // Crear contenedor de mensaje si no existe
+    if (selectLider && roleSelect) {
         let infoMsg = document.getElementById("lider-info-msg");
         if (!infoMsg) {
             infoMsg = document.createElement("div");
             infoMsg.id = "lider-info-msg";
-            infoMsg.className = "alert alert-info small py-1 mt-2";
-            infoMsg.setAttribute("role", "status");
-            infoMsg.setAttribute("aria-live", "polite");
-            infoMsg.textContent = "";
-            selectLider.parentNode.insertBefore(infoMsg, selectLider.nextSibling);
+            infoMsg.className = "alert alert-warning small py-1 mt-1 mb-0";
+            infoMsg.style.display = "none";
+            infoMsg.textContent = "Un Líder no puede tener otro líder asignado.";
+            selectLider.parentNode.appendChild(infoMsg);
         }
 
-        function isRoleLeader(value) {
-            if (!value) return false;
-            return value.toString().toUpperCase().includes("LIDER");
-        }
-
-        function toggleLeaderSelect(isLeader) {
+        function toggleLeaderSelect(val) {
+            const isLeader = val.toString().toUpperCase().includes("LIDER");
             if (isLeader) {
                 selectLider.disabled = true;
                 selectLider.value = "";
-                selectLider.selectedIndex = 0;
-                infoMsg.textContent = "Al seleccionar el rol «Líder», este votante no puede tener un líder asignado. El campo se ha deshabilitado automáticamente.";
+                fillLiderFields();
                 infoMsg.style.display = "block";
-                selectLider.setAttribute("aria-disabled", "true");
-                selectLider.classList.add("disabled");
             } else {
                 selectLider.disabled = false;
                 infoMsg.style.display = "none";
-                selectLider.removeAttribute("aria-disabled");
-                selectLider.classList.remove("disabled");
             }
         }
 
-        // Inicializar y agregar eventos
-        if (roleSelect) {
-            toggleLeaderSelect(isRoleLeader(roleSelect.value));
-            roleSelect.addEventListener("change", function() {
-                toggleLeaderSelect(isRoleLeader(this.value));
-            });
-        }
-        if (roleRadios && roleRadios.length) {
-            const checked = Array.from(roleRadios).find(r => r.checked);
-            toggleLeaderSelect(isRoleLeader(checked ? checked.value : ""));
-            roleRadios.forEach(r => {
-                r.addEventListener("change", function() {
-                    toggleLeaderSelect(isRoleLeader(this.value));
-                });
-            });
-        }
+        roleSelect.addEventListener("change", (e) => toggleLeaderSelect(e.target.value));
+        selectLider.addEventListener("change", fillLiderFields);
+        
+        // Ejecución inicial
+        toggleLeaderSelect(roleSelect.value);
+        setTimeout(fillLiderFields, 200);
     }
 
-    // =========================
-    // CARGAR MUNICIPIOS Y CORREGIMIENTOS SEGÚN DEPARTAMENTO
-    // =========================
-    function cargarCorregimientos(municipioId, selectedCorreg = null) {
-        if (!selectCorreg) return;
-        if (!municipioId) {
-            selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-            selectCorreg.disabled = true;
-            return;
-        }
-
-        fetch(`/personas/ajax/corregimientos/?municipio_id=${municipioId}`)
-            .then(res => res.json())
-            .then(data => {
-                selectCorreg.innerHTML = '<option value="">Seleccione (SOLO SI APLICA)</option>';
-                data.corregimientos.forEach(c => {
-                    const opt = document.createElement("option");
-                    opt.value = c.id;
-                    opt.textContent = c.nombre;
-                    if (selectedCorreg && c.id == selectedCorreg) opt.selected = true;
-                    selectCorreg.appendChild(opt);
+    // ==========================================
+    // 2. LÓGICA RESIDENCIA (SECUENCIAL)
+    // ==========================================
+    if (selectDeptRes) {
+        selectDeptRes.addEventListener("change", function() {
+            resetSelect(selectMuniRes, "Cargando...");
+            resetSelect(selectCorrRes, "---", true);
+            if (!this.value) return;
+            fetch(`/personas/ajax/municipios/?departamento_id=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    resetSelect(selectMuniRes, "Seleccione Municipio", false);
+                    data.municipios.forEach(m => selectMuniRes.add(new Option(m.nombre, m.id)));
+                    if (initMuniResId) {
+                        selectMuniRes.value = initMuniResId;
+                        selectMuniRes.dispatchEvent(new Event('change'));
+                    }
                 });
-                selectCorreg.disabled = false;
-            });
+        });
     }
 
-    function cargarMunicipios(departamentoId, selectedMunicipio = null) {
-        if (!selectMunicipio) return;
-        if (!departamentoId) {
-            selectMunicipio.innerHTML = "<option>Seleccione un departamento</option>";
-            selectMunicipio.disabled = true;
-            selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-            selectCorreg.disabled = true;
-            return;
-        }
+    if (selectMuniRes) {
+        selectMuniRes.addEventListener("change", function() {
+            resetSelect(selectCorrRes, "Cargando...");
+            if (!this.value) return;
+            fetch(`/personas/ajax/corregimientos/?municipio_id=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    resetSelect(selectCorrRes, "Seleccione (Si aplica)", false);
+                    data.corregimientos.forEach(c => selectCorrRes.add(new Option(c.nombre, c.id)));
+                    if (initCorrResId) selectCorrRes.value = initCorrResId;
+                });
+        });
+    }
 
-        fetch(`/personas/ajax/municipios/?departamento_id=${departamentoId}`)
+    // ==========================================
+    // 3. LÓGICA PUESTO DE VOTACIÓN (SECUENCIAL)
+    // ==========================================
+    fDeptPuesto.addEventListener("change", function() {
+        resetSelect(fMuniPuesto, "Cargando...");
+        resetSelect(fCorrePuesto, "---", true);
+        resetSelect(selectPuesto, "---", true);
+        if (!this.value) return;
+        fetch(`/personas/ajax/municipios/?departamento_id=${this.value}`)
             .then(res => res.json())
             .then(data => {
-                selectMunicipio.innerHTML = '<option value="">Seleccione un municipio</option>';
-                data.municipios.forEach(m => {
-                    const opt = document.createElement("option");
-                    opt.value = m.id;
-                    opt.textContent = m.nombre;
-                    if (selectedMunicipio && m.id == selectedMunicipio) opt.selected = true;
-                    selectMunicipio.appendChild(opt);
-                });
-                selectMunicipio.disabled = false;
-
-                if (selectedMunicipio) {
-                    cargarCorregimientos(selectedMunicipio, corregSeleccionado);
-                } else {
-                    selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-                    selectCorreg.disabled = true;
+                resetSelect(fMuniPuesto, "Seleccione Municipio", false);
+                data.municipios.forEach(m => fMuniPuesto.add(new Option(m.nombre, m.id)));
+                if (initMuniPuestoId) {
+                    fMuniPuesto.value = initMuniPuestoId;
+                    fMuniPuesto.dispatchEvent(new Event('change'));
                 }
             });
-    }
+    });
 
-    // =========================
-    // EVENTOS PARA DEPARTAMENTO Y MUNICIPIO
-    // =========================
-    if (selectDepartamento) {
-        selectDepartamento.addEventListener("change", function () {
-            cargarMunicipios(this.value);
+    fMuniPuesto.addEventListener("change", function() {
+        resetSelect(fCorrePuesto, "Cargando...");
+        resetSelect(selectPuesto, "Cargando...", true);
+        if (!this.value) return;
+        fetch(`/personas/ajax/corregimientos/?municipio_id=${this.value}`)
+            .then(res => res.json())
+            .then(data => {
+                resetSelect(fCorrePuesto, "Opcional", false);
+                data.corregimientos.forEach(c => fCorrePuesto.add(new Option(c.nombre, c.id)));
+                if (initCorrePuestoId) fCorrePuesto.value = initCorrePuestoId;
+            });
+        cargarPuestos(this.value, fCorrePuesto.value);
+    });
+
+    fCorrePuesto.addEventListener("change", () => cargarPuestos(fMuniPuesto.value, fCorrePuesto.value));
+
+    function cargarPuestos(muniId, correId) {
+        resetSelect(selectPuesto, "Cargando...");
+        let url = `/personas/ajax/puestos/?municipio_id=${muniId}`;
+        if (correId) url += `&corregimiento_id=${correId}`;
+        fetch(url).then(res => res.json()).then(data => {
+            resetSelect(selectPuesto, "Seleccione Puesto", false);
+            data.puestos.forEach(p => {
+                const opt = new Option(p.nombre, p.id);
+                if (p.id == initPuestoId) opt.selected = true;
+                selectPuesto.add(opt);
+            });
+            if (selectPuesto.value) selectPuesto.dispatchEvent(new Event('change'));
         });
     }
-    if (selectMunicipio) {
-        selectMunicipio.addEventListener("change", function () {
-            cargarCorregimientos(this.value);
-        });
+
+    selectPuesto.addEventListener("change", function() {
+        if (this.value) cargarMesas(this.value);
+        else resetSelect(selectMesa, "---", true);
+    });
+
+    function cargarMesas(puestoId) {
+        resetSelect(selectMesa, "Cargando...");
+        fetch(`/personas/ajax/mesas/?puesto_id=${puestoId}`)
+            .then(res => res.json())
+            .then(data => {
+                resetSelect(selectMesa, "Seleccione Mesa", false);
+                data.mesas.forEach(m => {
+                    const opt = new Option("Mesa " + m.numero, m.id);
+                    if (m.id == initMesaId) opt.selected = true;
+                    selectMesa.add(opt);
+                });
+            });
     }
 
-    // =========================
-    // INICIALIZACIÓN AL CARGAR PÁGINA (EDICIÓN)
-    // =========================
-    if (selectDepartamento && selectDepartamento.value) {
-        cargarMunicipios(selectDepartamento.value, municipioSeleccionado);
-    } else {
-        if (selectMunicipio) {
-            selectMunicipio.innerHTML = "<option>Seleccione un departamento</option>";
-            selectMunicipio.disabled = true;
-        }
-        if (selectCorreg) {
-            selectCorreg.innerHTML = "<option>Seleccione un municipio</option>";
-            selectCorreg.disabled = true;
-        }
-    }
+    // --- DISPARO INICIAL (EDICIÓN) ---
+    if (selectDeptRes && selectDeptRes.value) selectDeptRes.dispatchEvent(new Event('change'));
+    if (fDeptPuesto && fDeptPuesto.value) fDeptPuesto.dispatchEvent(new Event('change'));
 
 });
 </script>
-
 {% endblock %}

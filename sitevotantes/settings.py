@@ -178,3 +178,8 @@ SECURE_PROXY_SSL_HEADER = None
 
 # Smart select admin
 SMART_SELECTS_USE_DJANGO_JQUERY = True
+
+# ---- Sesiones persistentes ----
+# Mantener la sesión aunque se cierre el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14  # 14 días

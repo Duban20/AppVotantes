@@ -15,7 +15,7 @@ class Mesa(models.Model):
     
     puesto_votacion = models.ForeignKey(
         PuestoVotacion,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name="Puesto de Votación",
         help_text="Seleccione el puesto de votación correspondiente."
     )

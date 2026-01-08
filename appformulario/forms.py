@@ -74,6 +74,10 @@ class VotanteForm(forms.ModelForm):
                 departamento=self.instance.municipio_residencia.departamento
             ).order_by('nombre')
 
+            self.initial['departamento_residencia'] = (
+                self.instance.municipio_residencia.departamento
+            )
+
         # --- CORREGIMIENTO (depende del municipio seleccionado) ---
         self.fields['corregimiento_residencia'].queryset = Corregimiento.objects.none()
         if "municipio_residencia" in self.data:

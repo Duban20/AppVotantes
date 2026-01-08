@@ -1,6 +1,31 @@
 from django.contrib import admin
+from django.db.models import Count
 from simple_history.admin import SimpleHistoryAdmin
 from .models import Votante
+
+class VotantesPorLiderFilter(admin.SimpleListFilter):
+    title = 'Votantes por líder'
+    parameter_name = 'lider'
+
+    def lookups(self, request, model_admin):
+        lideres = (
+            Votante.objects
+            .filter(rol='LIDER_VOTANTE')
+            .annotate(total=Count('votantes_asignados'))
+            .filter(total__gt=0)
+        )
+        return [
+            (lider.id, f"{lider.nombre} {lider.apellido} ({lider.total})")
+            for lider in lideres
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(
+                rol='VOTANTE',              # SOLO votantes
+                lider_asignado_id=self.value()
+            )
+        return queryset.filter(rol='VOTANTE')  # por defecto no muestra líderes
 
 
 class VotanteAdmin(SimpleHistoryAdmin):
@@ -26,6 +51,7 @@ class VotanteAdmin(SimpleHistoryAdmin):
 
     list_filter = (
         'status',
+        VotantesPorLiderFilter,
         'rol',
         'mesa__puesto_votacion__municipio__departamento',
         'mesa',

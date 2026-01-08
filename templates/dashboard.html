@@ -4,114 +4,216 @@
 {% block title %}Dashboard | Estructura Electoral{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-5">
-    
-    <div class="text-center mb-5">
-        <!-- <h1 class="fw-bold text-primary mb-1">Visión General de la Base de Apoyo</h1> -->
-        <h2 class="fw-light text-muted fs-4">Bienvenido, {{ user.first_name|default:user.username }}</h2>
-    </div>
-
-    <div class="row justify-content-center g-4">
-        
-        <div class="col-sm-10 col-md-8 col-lg-5 col-xl-4">
-            <div class="card border-0 shadow-lg h-100 card-kpi card-hover-shadow">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center">
-                    
-                    <div>
-                        <p class="text-uppercase text-muted fw-bold small mb-1">Total de Votantes</p>
-                        <h1 class="display-4 fw-bolder text-success mb-0">
-                            {{ total_votantes|default:"0" }}
-                        </h1>
-                        <span class="text-muted small">Registros de apoyo activos</span>
-                    </div>
-
-                    <div class="icon-huge bg-success bg-opacity-10 text-white"> 
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                </div>
-                
-                <!-- <div class="card-footer bg-white border-0 py-3">
-                    <a href="/personas/crear" class="text-decoration-none fw-bold text-primary small">
-                        Nuevo Registro <i class="bi bi-arrow-right-short"></i>
-                    </a>
-                </div> -->
-            </div>
-        </div>
-
-        <div class="col-sm-10 col-md-8 col-lg-5 col-xl-4">
-            <div class="card border-0 shadow-lg h-100 card-kpi card-hover-shadow">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center">
-                    
-                    <div>
-                        <p class="text-uppercase text-muted fw-bold small mb-1">Total de Líderes</p>
-                        <h1 class="display-4 fw-bolder text-success mb-0">
-                            {{ total_lideres|default:"0" }}
-                        </h1>
-                        <span class="text-muted small">Estructura de mando activa</span>
-                    </div>
-
-                    <div class="icon-huge bg-success bg-opacity-10 text-white">
-                        <i class="bi bi-person-badge-fill"></i>
-                    </div>
-                </div>
-                
-                <!-- <div class="card-footer bg-white border-0 py-3">
-                    <a href="/personas/?rol=lider" class="text-decoration-none fw-bold text-success small">
-                        Administrar líderes <i class="bi bi-arrow-right-short"></i>
-                    </a>
-                </div> -->
-            </div>
-        </div>
-        
-    </div>
-    
-    <div class="row justify-content-center mt-4 g-4">
-        <div class="col-md-5 col-lg-3 text-center">
-            <a href="/personas" class="btn btn-success btn-lg rounded-pill shadow-sm w-100 py-3">
-                <i class="bi bi-list-columns-reverse me-2"></i> Ver Listado 
-            </a>
-        </div>
-
-        <div class="col-md-5 col-lg-3 text-center">
-            <a href="/personas/crear" class="btn btn-outline-success btn-lg rounded-pill shadow-sm w-100 py-3">
-                <i class="bi bi-person-plus-fill me-2"></i> Nuevo Registro
-            </a>
-        </div>
-        
-        <!-- <div class="col-md-5 col-lg-3 text-center">
-            <form action="{% url 'logout' %}" method="post" class="w-100">
-                {% csrf_token %} 
-                <button type="submit" class="btn btn-outline-danger btn-lg rounded-pill shadow-sm w-100 py-3">
-                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
-                </button>
-            </form>
-        </div> -->
-    </div>
-
 <style>
-    /* Estilo del ícono grande */
-    .icon-huge {
-        width: 90px;
-        height: 90px;
+    /* Fondo con sutil gradiente para el Dashboard */
+    .dashboard-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+    }
+
+    /* Tarjetas Modernas */
+    .card-kpi {
+        border-radius: 24px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-kpi:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Decoración interna de la tarjeta */
+    .card-kpi::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
+    }
+
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2.8rem;
-    }
-    
-    /* Efecto de sombra y elevación al pasar el mouse */
-    .card-hover-shadow {
-        transition: all 0.3s ease;
-        border-radius: 1rem; 
-        border: 1px solid rgba(0,0,0,.05) !important;
+        font-size: 2rem;
+        transition: transform 0.3s ease;
     }
 
-    .card-hover-shadow:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+    .card-kpi:hover .icon-box {
+        transform: scale(1.1) rotate(5deg);
     }
-    
+
+    /* Botones de acción rápida */
+    .btn-action {
+        border-radius: 18px;
+        padding: 1.2rem;
+        font-weight: 700;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action i {
+        font-size: 1.5rem;
+    }
+
+    .btn-main {
+        background: var(--color-text);
+        color: white;
+    }
+
+    .btn-main:hover {
+        background: #000;
+        color: white;
+        transform: scale(1.02);
+    }
+
+    .btn-outline-custom {
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: var(--color-text);
+    }
+
+    .btn-outline-custom:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        background: rgba(37, 99, 235, 0.02);
+    }
 </style>
+
+    <div class="container py-4">
+        
+        <div class="dashboard-header shadow-sm d-flex justify-content-between align-items-center flex-wrap p-4 bg-white" style="border-radius: 20px;">
+        <div>
+            <h1 class="h3 fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.5px;">Resumen General</h1>
+            <p class="text-muted mb-0 small">
+                Bienvenido, <span class="text-primary fw-semibold">{{ user.first_name|default:user.username }}</span>. 
+            </p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <div class="text-end d-none d-sm-block">
+                <div class="fw-bold text-dark" style="font-size: 0.9rem; line-height: 1;">
+                    {% now "l, j" %} de {% now "F" %}
+                </div>
+                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">
+                    {% now "Y" %}
+                </div>
+            </div>
+
+            <div class="vr opacity-25 d-none d-sm-block" style="height: 35px;"></div>
+
+            <div class="d-flex align-items-center bg-light px-3 py-2 rounded-4 border border-white shadow-sm" style="min-width: 110px;">
+                <i class="bi bi-clock-fill text-primary me-2"></i>
+                <span id="liveClock" class="font-monospace fw-bold text-primary" style="font-size: 1.1rem;">
+                    --:--:--
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('liveClock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Iniciar el reloj y actualizar cada segundo
+        setInterval(updateClock, 1000);
+        updateClock(); // Llamada inicial inmediata
+    </script>
+
+    <div class="row justify-content-center g-4 mb-5">
+    <div class="col-md-6 col-xl-5">
+        <div class="card border-0 shadow-sm bg-white card-kpi" style="border-radius: 20px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="me-4 d-flex align-items-center justify-content-center" 
+                     style="width: 65px; height: 65px; 
+                            background: linear-gradient(145deg, #ffffff, #e6efff); 
+                            border-radius: 18px; 
+                            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.03), -2px -2px 8px rgba(255, 255, 255, 0.8);
+                            border: 1px solid rgba(13, 110, 253, 0.1);">
+                    <i class="bi bi-people-fill" style="font-size: 1.8rem; color: #0d6efd;"></i>
+                </div>
+                
+                <div>
+                    <p class="text-uppercase text-muted fw-bolder mb-0" style="font-size: 0.7rem; letter-spacing: 1.2px;">Base de Apoyo</p>
+                    <h2 class="fw-bold mb-0 text-dark" style="font-size: 2.2rem; letter-spacing: -1px;">{{ total_votantes|default:"0" }}</h2>
+                    <div class="d-flex align-items-center mt-1">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.65rem;">
+                            <i class="bi bi-check-circle-fill me-1"></i>Votantes
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-5">
+        <div class="card border-0 shadow-sm bg-white card-kpi" style="border-radius: 20px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="me-4 d-flex align-items-center justify-content-center" 
+                     style="width: 65px; height: 65px; 
+                            background: linear-gradient(145deg, #ffffff, #ebf7ed); 
+                            border-radius: 18px; 
+                            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.03), -2px -2px 8px rgba(255, 255, 255, 0.8);
+                            border: 1px solid rgba(25, 135, 84, 0.1);">
+                    <i class="bi bi-person-badge-fill" style="font-size: 1.8rem; color: #198754;"></i>
+                </div>
+                
+                <div>
+                    <p class="text-uppercase text-muted fw-bolder mb-0" style="font-size: 0.7rem; letter-spacing: 1.2px;">Estructura de Mando</p>
+                    <h2 class="fw-bold mb-0 text-dark" style="font-size: 2.2rem; letter-spacing: -1px;">{{ total_lideres|default:"0" }}</h2>
+                    <div class="d-flex align-items-center mt-1">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.65rem;">
+                            <i class="bi bi-star-fill me-1"></i>Líderes
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <h5 class="fw-bold mb-4 d-flex align-items-center justify-content-center">
+        <span class="bg-primary p-1 rounded-circle me-2" style="width: 8px; height: 8px;"></span>
+        Gestión Principal
+    </h5>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-10 col-sm-6 col-md-4">
+            <a href="/personas" class="btn btn-action btn-main shadow-sm h-100 py-4">
+                <i class="bi bi-grid-3x3-gap fs-3 mb-2"></i>
+                <span class="fs-5">Ver Listado Completo</span>
+                <small class="opacity-75 fw-light text-xsmall">Consulta y filtra tu base de datos</small>
+            </a>
+        </div>
+
+        <div class="col-10 col-sm-6 col-md-4">
+            <a href="/personas/crear" class="btn btn-action btn-outline-custom shadow-sm h-100 py-4">
+                <i class="bi bi-person-plus fs-3 mb-2"></i>
+                <span class="fs-5">Nuevo Registro</span>
+                <small class="text-muted fw-light text-xsmall">Añade un nuevo votante o líder</small>
+            </a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
