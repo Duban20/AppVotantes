@@ -118,6 +118,55 @@
         }
 
         footer { font-size: 0.8rem; }
+
+        /* Ajuste para que el perfil no ocupe demasiado espacio en móvil */
+        @media (max-width: 576px) {
+            .user-profile-nav {
+                padding: 4px; /* Menos padding */
+                gap: 0;
+            }
+            .user-info {
+                display: none !important; /* Escondemos el nombre en móviles muy pequeños, dejamos solo el círculo */
+            }
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+            }
+            .navbar-brand span {
+                font-size: 1rem; /* Logo un poco más pequeño en móvil */
+            }
+        }
+
+        /* Evitar que el botón de logout sea muy grande en móvil */
+        .btn-logout-new {
+            width: 38px;
+            height: 38px;
+        }
+
+        /* Efecto al pasar el mouse por el perfil */
+        .user-profile-nav:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        /* Estilo del item de cerrar sesión */
+        .btn-logout-hover {
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            color: #475569;
+        }
+
+        .btn-logout-hover:hover {
+            background-color: #fff1f2 !important; /* Rojo muy tenue */
+            color: #e11d48 !important; /* Rojo moderno */
+        }
+
+        /* Ajuste para el avatar dentro del dropdown si es necesario */
+        .dropdown-item:active {
+            background-color: #e2e8f0;
+        }
     </style>
 </head>
 
@@ -125,48 +174,79 @@
 
 <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="/">
-            <i class="bi bi-shield-check me-2"></i>
-            <span>Votaciones<span class="text-success">2026</span></span>
-        </a>
+        {% load static %} <a class="navbar-brand d-flex align-items-center" href="/">
+    <div class="me-3 d-flex align-items-center justify-content-center overflow-hidden" 
+        style="width: 50px; height: 50px; background: #ffffff; border-radius: 12px;">
+        
+        <img src="{% static 'img/logoeg.png' %}" 
+             alt="Logo Equipo Guajira" 
+             style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
+             
+    </div>
 
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+    <div class="d-flex flex-column" style="line-height: 1.1;">
+        <span class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 1.25rem;">
+            Votaciones<span class="text-success">2026</span>
+        </span>
+        <span class="text-success fw-semibold d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+            <i class="bi bi-geo-alt-fill me-1" style="font-size: 0.7rem;"></i>
+            EQUIPO GUAJIRA
+        </span>
+    </div>
+</a>
+
+        <div class="d-flex align-items-center ms-auto me-2 me-lg-0 order-lg-2">
+            {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <div class="user-profile-nav shadow-sm d-flex align-items-center" 
+                        id="userMenu" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false" 
+                        style="cursor: pointer; transition: all 0.3s ease;">
+                        
+                        <div class="user-avatar text-uppercase">
+                            {{ user.username|slice:":2" }}
+                        </div>
+                        <div class="user-info d-none d-sm-flex"> 
+                            <span class="user-label">Sesión Iniciada</span>
+                            <span class="user-name">{{ user.username }} <i class="bi bi-chevron-down ms-1 small opacity-50"></i></span>
+                        </div>
+                    </div>
+
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2" 
+                        aria-labelledby="userMenu" 
+                        style="border-radius: 15px; min-width: 200px;">
+                        
+                        <li class="px-3 py-2 d-md-none border-bottom mb-2">
+                            <span class="text-muted small d-block">Usuario:</span>
+                            <span class="fw-bold text-dark">{{ user.username }}</span>
+                        </li>
+
+                        <li>
+                            <form action="/logout/" method="post" class="m-0">
+                                {% csrf_token %} 
+                                <button type="submit" class="dropdown-item btn-logout-hover rounded-3 py-2 d-flex align-items-center justify-content-between">
+                                    <span class="fw-medium">Cerrar Sesión</span>
+                                    <i class="bi bi-box-arrow-right fs-5 text-danger"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <a href="/login/" class="btn btn-sm btn-dark rounded-pill px-3">
+                    Iniciar Sesión
+                </a>
+            {% endif %}
+        </div>
+
+        <button class="navbar-toggler border-0 shadow-none order-lg-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="width: 1.2em; height: 1.2em;"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <div class="user-profile-nav shadow-sm">
-                            <div class="user-avatar text-uppercase">
-                                {{ user.username|slice:":2" }}
-                            </div>
-                            <div class="user-info">
-                                <span class="user-label">Sesión Iniciada</span>
-                                <span class="user-name">{{ user.username }}</span>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="nav-item ms-2">
-                        <form action="/logout/" method="post" class="m-0">
-                            {% csrf_token %} 
-                            <button type="submit" class="btn-logout-new" title="Cerrar Sesión">
-                                <i class="bi bi-power fs-5"></i>
-                            </button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a href="/login/" class="btn btn-sm btn-dark rounded-pill px-4">
-                            Iniciar Sesión
-                        </a>
-                    </li>
-                {% endif %}
-
-            </ul>
+        <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
+            <ul class="navbar-nav">
+                </ul>
         </div>
     </div>
 </nav>

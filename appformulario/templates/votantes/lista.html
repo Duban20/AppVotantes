@@ -14,9 +14,19 @@
     
     /* Forzar que el contenido no se desborde */
     .table-container {
-        overflow-x: hidden; /* Evita el scroll horizontal */
+        overflow-x: auto; /* Cambiado de hidden a auto */
         border-radius: 15px;
         border: 1px solid #eee;
+        -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
+    }
+
+    /* Estilo para la barra de scroll (opcional para que se vea más limpia) */
+    .table-container::-webkit-scrollbar {
+        height: 6px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
     }
     .content-wrapper { font-size: 0.88rem; } /* Reduce ligeramente la fuente general */
 </style>
@@ -40,7 +50,7 @@
                         <div class="d-inline-flex gap-2">
                             {% if perms.appformulario.export_excel_votante %}
                             <a href="{% url 'exportar_votantes' %}" class="btn btn-outline-success rounded-pill px-3 fw-bold">
-                                <i class="bi bi-file-earmark-excel me-1"></i>Excel
+                                <i class="bi bi-file-earmark-excel me-1"></i>Exportar a Excel
                             </a>
                             {% endif %}
                             {% if perms.appformulario.add_votante %}
@@ -124,8 +134,8 @@
                     <input type="hidden" name="status" value="{{ status_filter|default:'' }}">
                 </form>
 
-                <div class="table-container">
-                    <table class="table table-hover align-middle mb-0" style="table-layout: fixed; width: 100%;">
+                <div class="table-container table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="width: 100%; min-width: 800px;">
                         <thead class="table-light">
                             <tr class="text-uppercase text-secondary text-xsmall fw-bolder">
                                 <th style="width: 100px;" class="text-center px-2">Rol/Estado</th>
@@ -220,6 +230,16 @@
                                                 </a>
                                             {% endif %}
                                         {% endif %}
+
+                                        {% if perms.appformulario.delete_votante %}
+                                            <a href="{% url 'eliminar_votante' v.id %}" 
+                                            class="btn btn-sm btn-outline-danger border-0 rounded-circle d-flex align-items-center justify-content-center action-btn" 
+                                            style="width: 35px; height: 35px;" 
+                                            onclick="return confirm('¿Estás seguro de eliminar permanentemente a {{ v.nombre }}? Esta acción no se puede deshacer.');"
+                                            title="Eliminar">
+                                                <i class="bi bi-trash3 fs-5"></i>
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -233,16 +253,53 @@
                 </div>
 
                 {% if votantes.has_other_pages %}
-                <nav class="mt-3">
-                    <ul class="pagination pagination-sm justify-content-center">
+                <nav class="mt-4">
+                    <ul class="pagination pagination-sm justify-content-center align-items-center">
+                        
                         {% if votantes.has_previous %}
-                            <li class="page-item"><a class="page-link border-0 rounded-pill mx-1" href="?page={{ votantes.previous_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">Anterior</a></li>
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-pill mx-1 bg-light text-dark shadow-sm" 
+                                href="?page=1&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}" 
+                                title="Primera página">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-pill mx-1 text-muted" 
+                                href="?page={{ votantes.previous_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">
+                                    Anterior
+                                </a>
+                            </li>
                         {% endif %}
-                        <li class="page-item active"><span class="page-link border-0 rounded-pill mx-1 shadow-sm">{{ votantes.number }}</span></li>
+
+                        <li class="page-item active">
+                            <span class="page-link border-0 rounded-pill mx-2 shadow-sm fw-bold px-3" 
+                                style="background-color: var(--color-primary); min-width: 40px; text-align: center;">
+                                {{ votantes.number }}
+                            </span>
+                        </li>
+
                         {% if votantes.has_next %}
-                            <li class="page-item"><a class="page-link border-0 rounded-pill mx-1" href="?page={{ votantes.next_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">Siguiente</a></li>
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-pill mx-1 text-muted" 
+                                href="?page={{ votantes.next_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">
+                                    Siguiente
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-pill mx-1 bg-light text-dark shadow-sm" 
+                                href="?page={{ votantes.paginator.num_pages }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}" 
+                                title="Última página">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
                         {% endif %}
+
                     </ul>
+                    
+                    <div class="text-center mt-2">
+                        <small class="text-muted opacity-75">Página {{ votantes.number }} de {{ votantes.paginator.num_pages }}</small>
+                    </div>
                 </nav>
                 {% endif %}
             </div>
