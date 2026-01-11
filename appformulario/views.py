@@ -113,21 +113,37 @@ def eliminar_votante(request, pk):
         messages.error(request, "❌ No se puede eliminar este votante.")
     return redirect('lista_votantes')
 
+
 @login_required
 @permission_required('appformulario.change_status_votante', raise_exception=True)
 def cambiar_estado_votante(request, pk):
     vot = get_object_or_404(Votante, pk=pk)
     
-    if vot.status == 'ACTIVE':
-        vot.status = 'INACTIVE'
-        messages.warning(request, f"⚠️ Votante {vot.nombre} {vot.apellido} marcado como INACTIVO.")
+    if request.method == 'POST':
+        # --- CASO: INACTIVACIÓN (Viene del Modal) ---
+        if vot.status == 'ACTIVE':
+            motivo = request.POST.get('motivo')
+            
+            if not motivo:
+                messages.error(request, "❌ Debe proporcionar un motivo para inactivar al votante.")
+            else:
+                vot.status = 'INACTIVE'
+                vot.motivo_inactivacion = motivo  # Guardamos la razón
+                vot.save()
+                messages.warning(request, f"⚠️ Votante {vot.nombre} marcado como INACTIVO por: {motivo}")
+    
     else:
-        vot.status = 'ACTIVE'
-        messages.success(request, f"✅ Votante {vot.nombre} {vot.apellido} marcado como ACTIVO.")
-    
-    vot.save()
-    
-    # Redirige a la página de lista, conservando los filtros si es posible
+        # --- CASO: ACTIVACIÓN (Viene del enlace simple GET) ---
+        if vot.status == 'INACTIVE':
+            vot.status = 'ACTIVE'
+            vot.motivo_inactivacion = None  # Limpiamos el motivo al reactivar
+            vot.save()
+            messages.success(request, f"✅ Votante {vot.nombre} {vot.apellido} ha sido REACTIVADO.")
+        else:
+            # Si intentan acceder por URL siendo ya activo, no hacemos nada o redirigimos
+            pass
+
+    # Redirige a la página anterior o a la lista por defecto
     return redirect(request.META.get('HTTP_REFERER', 'lista_votantes'))
 
 @login_required

@@ -121,6 +121,13 @@ class Votante(models.Model):
         help_text="Estado actual (Activo/Inactivo)."
     )
 
+    motivo_inactivacion = models.TextField(
+        null=True, 
+        blank=True, 
+        verbose_name="Motivo de Inactivación",
+        help_text="Explique brevemente por qué se inactivó a esta persona."
+    )
+
     # Auditoría
     history = HistoricalRecords()
 

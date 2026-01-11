@@ -29,6 +29,143 @@
         border-radius: 10px;
     }
     .content-wrapper { font-size: 0.88rem; } /* Reduce ligeramente la fuente general */
+
+    /* Popover de mensaje de motivo de inactivacion */
+    /* --- DISEÑO BASE PARA TODOS LOS POPOVERS --- */
+    .popover {
+        border: none !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        border-radius: 12px !important;
+        padding: 0.2rem;
+    }
+
+    .popover-header {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+        font-weight: bold !important;
+        font-size: 0.9rem !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 0.75rem 1rem !important;
+    }
+
+    .popover-body {
+        color: #6c757d !important;
+        font-size: 0.85rem !important;
+        padding: 0.75rem 1rem !important;
+    }
+
+    /* --- VARIACIÓN: LÍDER (TÍTULO AZUL) --- */
+    .popover-lider .popover-header {
+        color: #0d6efd !important; /* Azul */
+    }
+
+    /* --- VARIACIÓN: INACTIVO (TÍTULO ROJO) --- */
+    .popover-inactivo .popover-header {
+        color: #dc3545 !important; /* Rojo */
+    }
+
+    /* Efectos Hover para los disparadores */
+    .hover-popover-inactivo:hover {
+        background-color: #f8d7da !important;
+        color: #842029 !important;
+        transition: all 0.3s ease;
+    }
+
+    .hover-popover-lider:hover {
+        text-decoration: underline;
+        opacity: 0.8;
+    }
+
+    /* --- DISEÑO DE BADGES (ROL) --- */
+    .custom-badge {
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        text-transform: uppercase;
+    }
+
+    .badge-lider {
+        background-color: #e7f0ff; /* Azul muy suave */
+        color: #0d6efd;            /* Texto azul fuerte */
+        border: 1px solid #0d6efd33;
+    }
+
+    .badge-votante {
+        background-color: #e6fffa; /* Verde menta suave */
+        color: #006545;            /* Verde esmeralda */
+        border: 1px solid #05966933;
+    }
+
+    /* --- DISEÑO DE INDICADORES (ESTADO) --- */
+    .status-indicator {
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .status-indicator .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    /* Estado Activo */
+    .status-active {
+        color: #16a34a;
+    }
+    .status-active .dot {
+        background-color: #16a34a;
+        box-shadow: 0 0 8px #16a34a66;
+    }
+
+    /* Estado Inactivo */
+    .status-inactive {
+        color: #64748b;
+        background-color: #f1f5f9; /* Fondo gris suave para resaltar que es interactivo */
+    }
+    .status-inactive .dot {
+        background-color: #94a3b8;
+    }
+
+    /* Efecto hover específico para el inactivo con popover */
+    .status-inactive:hover {
+        background-color: #fee2e2; /* Rojo muy suave al pasar el mouse */
+        color: #dc3545;
+    }
+
+    /* Color personalizado para las filas intercaladas (Zebra) */
+    .table-striped > tbody > tr:nth-of-type(odd) > * {
+        background-color: #fcfcfc; /* Un gris casi blanco, muy sutil */
+        box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.02); /* Ajuste de opacidad */
+    }
+
+    /* Asegurar que el hover siga resaltando bien */
+    .table-hover > tbody > tr:hover > * {
+        background-color: #f1f4f9 !important; /* Un azul muy tenue al pasar el mouse */
+        transition: background-color 0.2s ease;
+    }
+
+    .table-container table {
+    border-collapse: separate;
+    border-spacing: 0;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid #ebeef2; /* Línea sutil bajo el encabezado */
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        border-bottom: 1px solid #f0f0f0; /* Líneas suaves entre filas */
+    }
 </style>
 
 <div class="row justify-content-center content-wrapper">
@@ -101,7 +238,7 @@
                         </div>
                     </div>
 
-                                        <div class="col-md-4">
+                    <div class="col-md-4">
                         <label class="form-label text-xsmall fw-bolder text-secondary text-uppercase mb-2" style="letter-spacing: 0.5px;">
                             <i class="bi bi-layers me-1"></i> Filtrar por Rol
                         </label>
@@ -135,43 +272,75 @@
                 </form>
 
                 <div class="table-container table-responsive">
-                    <table class="table table-hover align-middle mb-0" style="width: 100%; min-width: 800px;">
+                    <table class="table table-striped table-hover align-middle mb-0" style="width: 100%; min-width: 800px;">
                         <thead class="table-light">
                             <tr class="text-uppercase text-secondary text-xsmall fw-bolder">
-                                <th style="width: 100px;" class="text-center px-2">Rol/Estado</th>
-                                <th style="width: 200px;">Persona</th>
-                                <th style="width: 220px;">Residencia</th>
-                                <th style="width: 220px;">Votación</th>
-                                <th style="width: 80px;" class="text-center">Acciones</th>
+                                <th style="width: 100px;" class="text-center px-2">identificación</th>
+                                <th style="width: 200px;" class="text-center">datos personales</th>
+                                <th style="width: 220px;" class="text-center">Ubicación y Contacto</th>
+                                <th style="width: 220px;" class="text-center">Puesto de votación</th>
+                                <th style="width: 80px;" class="text-center">Gestión</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for v in votantes %}
-                            <tr class="{% if v.rol == 'LIDER_VOTANTE' %}row-lider{% endif %}">
-                                <td class="text-center px-1">
-                                    {% if v.rol == "LIDER_VOTANTE" %}
-                                        <span class="badge bg-primary rounded-pill text-xsmall mb-1">LÍDER</span>
-                                    {% else %}
-                                        <span class="badge bg-success text-white rounded-pill text-xsmall mb-1">VOTANTE</span>
-                                    {% endif %}
-                                    <div class="text-xsmall">
-                                        {% if v.status == "ACTIVE" %}
-                                            <span class="text-success fw-bold"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Activo</span>
+                            <tr class="{% if v.rol == 'LIDER_VOTANTE' %}row-lider{% endif %} text-center">
+                                <td class="text-center px-2 py-3">
+                                    <div class="mb-2">
+                                        {% if v.rol == "LIDER_VOTANTE" %}
+                                            <span class="custom-badge badge-lider">
+                                                <i class="bi bi-star-fill me-1"></i> LÍDER
+                                            </span>
                                         {% else %}
-                                            <span class="text-secondary"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Inactivo</span>
+                                            <span class="custom-badge badge-votante">
+                                                <i class="bi bi-person me-1"></i> VOTANTE
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="d-flex justify-content-center">
+                                        {% if v.status == "ACTIVE" %}
+                                            <div class="status-indicator status-active">
+                                                <span class="dot"></span> Activo
+                                            </div>
+                                        {% else %}
+                                            <div class="status-indicator status-inactive hover-popover-inactivo"
+                                                style="cursor: help;"
+                                                data-bs-toggle="popover" 
+                                                data-bs-trigger="hover focus"
+                                                data-bs-custom-class="popover-inactivo" 
+                                                data-bs-html="true"
+                                                title="<i class='bi bi-info-circle-fill me-2'></i> Motivo de Inactivación" 
+                                                data-bs-content="{{ v.motivo_inactivacion|default:'No se registró un motivo específico.' }}">
+                                                <span class="dot"></span> Inactivo
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </td>
 
                                 <td>
-                                    <div class="fw-bold text-truncate" title="{{ v.nombre }} {{ v.apellido }}">
-                                        {{ v.nombre }} {{ v.apellido }}
-                                    </div>
-                                    <div class="font-monospace text-muted text-xsmall">C.C. {{ v.cedula }}</div>
-                                    <div class="text-xsmall mt-1 text-primary">
-                                        <i class="bi bi-person-badge me-1"></i>{{ v.lider_asignado.nombre|default:"Sin Líder" }}
-                                    </div>
-                                </td>
+                                <div class="fw-bold text-truncate" title="{{ v.nombre }} {{ v.apellido }}">
+                                    {{ v.nombre }} {{ v.apellido }}
+                                </div>
+                                <div class="font-monospace text-muted text-xsmall">C.C. {{ v.cedula }}</div>
+                                
+                                <div class="text-xsmall mt-1">
+                                    {% if v.lider_asignado %}
+                                        <span class="text-primary fw-bold hover-popover-lider" 
+                                            style="cursor: help;"
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover focus"
+                                            data-bs-custom-class="popover-lider"
+                                            data-bs-html="true"
+                                            title="<i class='bi bi-person-badge-fill me-2'></i> Datos del Líder" 
+                                            data-bs-content="<div><strong>Nombre:</strong> {{ v.lider_asignado.nombre }} {{ v.lider_asignado.apellido }}</div><div class='mt-1'><strong>Teléfono:</strong> <span class='text-primary'>{{ v.lider_asignado.telefono|default:'No registrado' }}</span></div>">
+                                            <i class="bi bi-person-badge me-1"></i>{{ v.lider_asignado.nombre }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted"><i class="bi bi-person-badge me-1"></i>Sin Líder</span>
+                                    {% endif %}
+                                </div>
+                            </td>
 
                                 <td>
                                     <div class="text-small fw-bold">
@@ -213,13 +382,15 @@
 
                                         {% if perms.appformulario.change_status_votante %}
                                             {% if v.status == 'ACTIVE' %}
-                                                <a href="{% url 'cambiar_estado_votante' v.id %}" 
-                                                class="btn btn-sm btn-outline-secondary border-0 rounded-circle d-flex align-items-center justify-content-center" 
-                                                style="width: 35px; height: 35px; transition: all 0.3s;"
-                                                onclick="return confirm('¿Desactivar a {{ v.nombre }}?');"
-                                                title="Desactivar">
-                                                    <i class="bi bi-person-x fs-5"></i>
-                                                </a>
+                                                <button type="button" 
+                                                    class="btn btn-sm btn-outline-secondary border-0 rounded-circle d-flex align-items-center justify-content-center"
+                                                    style="width: 35px; height: 35px;"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalInactivar"
+                                                    onclick="prepararInactivacion('{{ v.id }}', '{{ v.nombre }} {{ v.apellido }}')"
+                                                    title="Desactivar">
+                                                <i class="bi bi-person-x fs-5"></i>
+                                            </button>
                                             {% else %}
                                                 <a href="{% url 'cambiar_estado_votante' v.id %}" 
                                                 class="btn btn-sm btn-outline-success border-0 rounded-circle d-flex align-items-center justify-content-center" 
@@ -306,4 +477,53 @@
         </div>
     </div>
 </div>
+
+<!-- Dialogo de inactivación -->
+ <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="modalInactivarLabel">Inactivar Votante</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="formInactivar" method="POST">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>¿Está seguro de inactivar a <strong id="nombreVotante"></strong>?</p>
+          <div class="mb-3">
+            <label for="motivo" class="form-label text-xsmall fw-bold">MOTIVO DE INACTIVACIÓN</label>
+            <textarea class="form-control" id="motivo" name="motivo" rows="3" required placeholder="Ej: Traslado de municipio, fallecimiento, etc."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger rounded-pill px-4">Confirmar Inactivación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function prepararInactivacion(id, nombre) {
+    document.getElementById('nombreVotante').innerText = nombre;
+    
+    // Construimos la URL dinámicamente. 
+    // Reemplazamos el '0' por el ID real del votante.
+    let urlBase = "{% url 'cambiar_estado_votante' 0 %}";
+    document.getElementById('formInactivar').action = urlBase.replace('0', id);
+}
+
+// JS para el mensaje de motivo
+document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar todos los popovers en la página
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            html: true, // Permite usar iconos en el título
+            sanitize: false,
+        })
+    })
+});
+</script>
 {% endblock %}
