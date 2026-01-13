@@ -3,6 +3,7 @@ from django.db.models import Count
 from simple_history.admin import SimpleHistoryAdmin
 from .models import Votante
 
+
 class VotantesPorLiderFilter(admin.SimpleListFilter):
     title = 'Votantes por líder'
     parameter_name = 'lider'
@@ -22,42 +23,45 @@ class VotantesPorLiderFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             return queryset.filter(
-                rol='VOTANTE',              # SOLO votantes
+                rol='VOTANTE',
                 lider_asignado_id=self.value()
             )
-        return queryset.filter(rol='VOTANTE')  # por defecto no muestra líderes
+        return queryset.filter(rol='VOTANTE')
 
 
 class VotanteAdmin(SimpleHistoryAdmin):
 
-    # ---------- LISTADO ----------
+    # --------------------------------------------------
+    # LISTADO
+    # --------------------------------------------------
     list_display = (
         'nombre',
         'apellido',
         'cedula',
-        'direccion_residencia',
         'telefono',
         'rol',
         'lider_nombre',
         'lider_cedula',
         'lider_telefono',
-        'mesa_numero',
-        'puesto_direccion',
-        'barrio_residencia',
         'puesto_nombre',
+        'puesto_direccion',
         'municipio_y_departamento_puesto',
         'status',
     )
 
+    # --------------------------------------------------
+    # FILTROS
+    # --------------------------------------------------
     list_filter = (
         'status',
         VotantesPorLiderFilter,
-        'rol',
-        'mesa__puesto_votacion__municipio__departamento',
-        'mesa',
-        'mesa__puesto_votacion',
+        'puesto_votacion__departamento',
+        'puesto_votacion',
     )
 
+    # --------------------------------------------------
+    # BÚSQUEDA
+    # --------------------------------------------------
     search_fields = (
         'nombre',
         'apellido',
@@ -65,15 +69,20 @@ class VotanteAdmin(SimpleHistoryAdmin):
         'telefono',
         'lider_asignado__nombre',
         'lider_asignado__apellido',
-        'mesa__numero',
-        'mesa__puesto_votacion__nombre_lugar',
+        'puesto_votacion__nombre_lugar',
+        'puesto_votacion__direccion',
     )
 
     ordering = ('apellido', 'nombre')
 
-    autocomplete_fields = ('mesa', 'lider_asignado')
+    autocomplete_fields = (
+        'lider_asignado',
+        'puesto_votacion',
+    )
 
-    # ---------- FIELDSETS ----------
+    # --------------------------------------------------
+    # FORMULARIO
+    # --------------------------------------------------
     fieldsets = (
         ('Información Personal', {
             'fields': (
@@ -97,25 +106,26 @@ class VotanteAdmin(SimpleHistoryAdmin):
         }),
     )
 
-    # ---------- OPTIMIZACIÓN ----------
+    # --------------------------------------------------
+    # OPTIMIZACIÓN
+    # --------------------------------------------------
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related(
             'lider_asignado',
-            'mesa',
-            'mesa__puesto_votacion',
-            'mesa__puesto_votacion__municipio',
-            'mesa__puesto_votacion__municipio__departamento',
+            'puesto_votacion',
+            'puesto_votacion__municipio',
+            'puesto_votacion__municipio__departamento',
         )
 
-    # ---------------------------------------------------
+    # --------------------------------------------------
     # COLUMNAS PERSONALIZADAS
-    # ---------------------------------------------------
-
+    # --------------------------------------------------
     def lider_nombre(self, obj):
-        if obj.lider_asignado:
-            return f"{obj.lider_asignado.nombre} {obj.lider_asignado.apellido}"
-        return "—"
+        return (
+            f"{obj.lider_asignado.nombre} {obj.lider_asignado.apellido}"
+            if obj.lider_asignado else "—"
+        )
     lider_nombre.short_description = "Líder"
     lider_nombre.admin_order_field = "lider_asignado__nombre"
 
@@ -127,32 +137,19 @@ class VotanteAdmin(SimpleHistoryAdmin):
         return obj.lider_asignado.telefono if obj.lider_asignado else "—"
     lider_telefono.short_description = "Teléfono Líder"
 
-    def mesa_numero(self, obj):
-        return obj.mesa.numero if obj.mesa else "—"
-    mesa_numero.short_description = "Mesa"
-    mesa_numero.admin_order_field = "mesa__numero"
+    def puesto_nombre(self, obj):
+        return obj.puesto_votacion.nombre_lugar if obj.puesto_votacion else "—"
+    puesto_nombre.short_description = "Puesto"
+    puesto_nombre.admin_order_field = "puesto_votacion__nombre_lugar"
 
     def puesto_direccion(self, obj):
-        try:
-            pv = obj.mesa.puesto_votacion
-            return pv.direccion if pv else "—"
-        except Exception:
-            return "—"
+        return obj.puesto_votacion.direccion if obj.puesto_votacion else "—"
     puesto_direccion.short_description = "Dirección Puesto"
-    puesto_direccion.admin_order_field = "mesa__puesto_votacion__direccion"
-
-    def puesto_nombre(self, obj):
-        try:
-            pv = obj.mesa.puesto_votacion
-            return pv.nombre_lugar if pv else "—"
-        except Exception:
-            return "—"
-    puesto_nombre.short_description = "Puesto"
-    puesto_nombre.admin_order_field = "mesa__puesto_votacion__nombre_lugar"
+    puesto_direccion.admin_order_field = "puesto_votacion__direccion"
 
     def municipio_y_departamento_puesto(self, obj):
         try:
-            municipio = obj.mesa.puesto_votacion.municipio
+            municipio = obj.puesto_votacion.municipio
             if municipio:
                 depto = municipio.departamento.nombre if municipio.departamento else ''
                 return f"{municipio.nombre} – {depto}" if depto else municipio.nombre
@@ -160,8 +157,7 @@ class VotanteAdmin(SimpleHistoryAdmin):
             pass
         return "—"
     municipio_y_departamento_puesto.short_description = "Mun. – Departamento (Puesto)"
-    municipio_y_departamento_puesto.admin_order_field = "mesa__puesto_votacion__municipio__nombre"
+    municipio_y_departamento_puesto.admin_order_field = "puesto_votacion__municipio__nombre"
 
 
-# Registrar admin
 admin.site.register(Votante, VotanteAdmin)

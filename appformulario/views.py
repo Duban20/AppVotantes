@@ -227,10 +227,14 @@ def exportar_votantes_excel(request):
 
     # Obtener solo votantes activos
     votantes = Votante.objects.filter(status='ACTIVE').select_related(
-        'puesto_votacion',
-        'mesa',
+        'departamento_residencia',
         'municipio_residencia',
-        'puesto_votacion__municipio__departamento',
+        'corregimiento_residencia',
+        'puesto_votacion',
+        'puesto_votacion__departamento',
+        'puesto_votacion__municipio',
+        'puesto_votacion__corregimiento',
+        'mesa',
         'lider_asignado'
     )
 
@@ -249,32 +253,47 @@ def exportar_votantes_excel(request):
         )
 
         data.append({
-            # ----- CAMPOS DEL MODELO -----
+            # ----- DATOS DEL VOTANTE -----
             'Rol': safe(v.get_rol_display()),
             'Nombres': safe(v.nombre),
             'Apellidos': safe(v.apellido),
             'Cédula': safe(v.cedula),
 
-            # Mostrar corregimiento si existe, sino municipio
-            'Lugar de residencia': safe(
-                v.corregimiento_residencia.nombre
-                if v.corregimiento_residencia
-                else v.municipio_residencia.nombre
-                if v.municipio_residencia
-                else None
+            # ----- RESIDENCIA -----
+            'Departamento residencia': safe(
+                v.departamento_residencia.nombre if v.departamento_residencia else None
             ),
-
-            'Dirección de residencia': safe(v.direccion_residencia),
-            'Barrio de residencia': safe(v.barrio_residencia),
+            'Municipio residencia': safe(
+                v.municipio_residencia.nombre if v.municipio_residencia else None
+            ),
+            'Corregimiento residencia': safe(
+                v.corregimiento_residencia.nombre if v.corregimiento_residencia else None
+            ),
+            'Dirección residencia': safe(v.direccion_residencia),
+            'Barrio residencia': safe(v.barrio_residencia),
             'Teléfono': safe(v.telefono),
 
-            # ----- PUESTO -----
-            'Puesto de votación': safe(nombre_puesto),
-            'Dirección puesto': safe(direccion_puesto),
-            'Municipio puesto': safe(municipio_puesto),
-            'Departamento puesto': safe(departamento_puesto),
+            # ----- PUESTO DE VOTACIÓN -----
+            'Puesto de votación': safe(
+                v.puesto_votacion.nombre_lugar if v.puesto_votacion else None
+            ),
+            'Dirección puesto': safe(
+                v.puesto_votacion.direccion if v.puesto_votacion else None
+            ),
+            'Departamento puesto': safe(
+                v.puesto_votacion.departamento.nombre
+                if v.puesto_votacion and v.puesto_votacion.departamento else None
+            ),
+            'Municipio puesto': safe(
+                v.puesto_votacion.municipio.nombre
+                if v.puesto_votacion and v.puesto_votacion.municipio else None
+            ),
+            'Corregimiento puesto': safe(
+                v.puesto_votacion.corregimiento.nombre
+                if v.puesto_votacion and v.puesto_votacion.corregimiento else None
+            ),
 
-            # Mesa
+            # ----- MESA -----
             'Mesa': safe(v.mesa.numero if v.mesa else None),
 
             # ----- LÍDER -----
@@ -282,11 +301,6 @@ def exportar_votantes_excel(request):
                 f"{v.lider_asignado.nombre} {v.lider_asignado.apellido}"
                 if v.lider_asignado else None
             ),
-            # 'Documento líder': safe(v.lider_asignado.cedula if v.lider_asignado else None),
-            # 'Teléfono líder': safe(v.lider_asignado.telefono if v.lider_asignado else None),
-
-            # Estado
-            # 'Estado': safe(v.get_status_display()),
         })
 
     # Crear DataFrame
