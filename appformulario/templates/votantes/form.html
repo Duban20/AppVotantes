@@ -2,6 +2,46 @@
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
+<style>
+    .form-control, .form-select { 
+        border-color: #e9ecef; 
+        font-size: 0.9rem; 
+        padding: 0.5rem 0.75rem; 
+    }
+
+    .form-control:focus, .form-select:focus { 
+        border-color: #198754; 
+        box-shadow: none; 
+    }
+
+    .form-control[readonly] { 
+        background-color: #f8f9fa !important; 
+        border-color: #eee; 
+        color: #6c757d; 
+        cursor: not-allowed; /* Cursor prohibido para campos readonly */
+    }
+
+    /* Estilos para selects */
+    select.form-select:not(:disabled) {
+        cursor: pointer; /* Cursor de mano cuando se puede interactuar */
+    }
+
+    select.form-select:disabled {
+        cursor: not-allowed; /* Cursor prohibido cuando está deshabilitado */
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+
+    /* Campos de líder (Cédula y Teléfono) */
+    #cedula_lider, #telefono_lider {
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .card { border-radius: 12px; }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card border-0 shadow-sm">
@@ -31,21 +71,22 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Cédula</label>
-                            {{ form.cedula }}
+
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Departamento</label>
+                            {{ form.departamento_residencia }}
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Rol</label>
-                            {{ form.rol }}
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Municipio</label>
+                            <select id="id_municipio_residencia" name="municipio_residencia" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Teléfono</label>
-                            {{ form.telefono }}
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Barrio</label>
-                            {{ form.barrio_residencia }}
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento</label>
+                            <select id="id_corregimiento_residencia" name="corregimiento_residencia" class="form-select" disabled>
+                                <option value="">---</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
@@ -57,24 +98,25 @@
                             {{ form.apellido }}
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Departamento Residencia</label>
-                            {{ form.departamento_residencia }}
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Cargo / Función</label>
+                            {{ form.rol }}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Municipio Residencia</label>
-                            <select id="id_municipio_residencia" name="municipio_residencia" class="form-select" disabled>
-                                <option value="">---</option>
-                            </select>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Cédula</label>
+                            {{ form.cedula }}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento Residencia</label>
-                            <select id="id_corregimiento_residencia" name="corregimiento_residencia" class="form-select" disabled>
-                                <option value="">---</option>
-                            </select>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Teléfono</label>
+                            {{ form.telefono }}
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-secondary mb-1">Barrio</label>
+                            {{ form.barrio_residencia }}
+                        </div>
+
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-secondary mb-1">Dirección de residencia</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Dirección</label>
                             {{ form.direccion_residencia }}
                         </div>
                     </div>
@@ -100,11 +142,11 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Ced. Líder</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Cédula del Líder</label>
                             <input id="cedula_lider" class="form-control bg-light" readonly tabindex="-1">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold text-secondary mb-1">Tel. Líder</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Teléfono del Líder</label>
                             <input id="telefono_lider" class="form-control bg-light" readonly tabindex="-1">
                         </div>
                     </div>
@@ -116,7 +158,7 @@
 
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Depto. Puesto</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Departamento del Puesto</label>
                             <select id="id_dept_puesto_filtro" class="form-select">
                                 <option value="">Seleccione...</option>
                                 {% for dept in form.fields.departamento_residencia.queryset %}
@@ -127,13 +169,13 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Muni. Puesto</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Municipio del Puesto</label>
                             <select id="id_muni_puesto_filtro" class="form-select" disabled>
                                 <option value="">---</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento Puesto</label>
+                            <label class="form-label small fw-bold text-secondary mb-1">Corregimiento del Puesto</label>
                             <select id="id_corre_puesto_filtro" class="form-select" disabled>
                                 <option value="">---</option>
                             </select>
@@ -154,7 +196,7 @@
 
                     <div class="d-flex justify-content-end align-items-center gap-3 mt-5 pt-3 border-top">
                         <a href="{% url 'lista_votantes' %}" class="btn btn-link text-decoration-none text-muted small">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-5 shadow-sm fw-bold">Guardar Votante</button>
+                        <button type="submit" class="btn btn-success px-5 shadow-sm fw-bold">Guardar Registro</button>
                     </div>
                 </form>
 
@@ -274,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch(`/personas/ajax/corregimientos/?municipio_id=${this.value}`)
                 .then(res => res.json())
                 .then(data => {
-                    resetSelect(selectCorrRes, "Seleccione (Si aplica)", false);
+                    resetSelect(selectCorrRes, "Seleccione (SOLO SI APLICA)", false);
                     data.corregimientos.forEach(c => selectCorrRes.add(new Option(c.nombre, c.id)));
                     if (initCorrResId) selectCorrRes.value = initCorrResId;
                 });
@@ -308,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`/personas/ajax/corregimientos/?municipio_id=${this.value}`)
             .then(res => res.json())
             .then(data => {
-                resetSelect(fCorrePuesto, "Opcional", false);
+                resetSelect(fCorrePuesto, "Seleccione (SOLO SI APLICA)", false);
                 data.corregimientos.forEach(c => fCorrePuesto.add(new Option(c.nombre, c.id)));
                 if (initCorrePuestoId) fCorrePuesto.value = initCorrePuestoId;
             });

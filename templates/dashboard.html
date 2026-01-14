@@ -119,25 +119,29 @@
             <div class="d-flex align-items-center bg-light px-3 py-2 rounded-4 border border-white shadow-sm" style="min-width: 110px;">
                 <i class="bi bi-clock-fill text-primary me-2"></i>
                 <span id="liveClock" class="font-monospace fw-bold text-primary" style="font-size: 1.1rem;">
-                    --:--:--
+                    --:--
                 </span>
             </div>
         </div>
     </div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            document.getElementById('liveClock').textContent = `${hours}:${minutes}:${seconds}`;
+    function updateClock() {
+        const now = new Date();
+
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12; // el 0 se convierte en 12
+        hours = String(hours).padStart(2, '0');
+
+        document.getElementById('liveClock').textContent = `${hours}:${minutes} ${ampm}`;
         }
 
-        // Iniciar el reloj y actualizar cada segundo
-        setInterval(updateClock, 1000);
-        updateClock(); // Llamada inicial inmediata
+        updateClock();                   // mostrar al cargar
+        setInterval(updateClock, 60000);  // actualizar cada minuto
     </script>
 
     <div class="row justify-content-center g-4 mb-5">

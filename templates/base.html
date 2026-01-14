@@ -170,12 +170,31 @@
         .dropdown-item:active {
             background-color: #e2e8f0;
         }
+
+        /* Botón Inicio – estilo sutil y elegante */
+.btn-inicio-custom {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* gris muy suave */
+    color: #0f172a;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-inicio-custom:hover {
+    background-color: #f8fafc; /* casi imperceptible */
+    border-color: #d1fae5;     /* verde MUY suave */
+    color: #0f172a;
+}
+
+.btn-inicio-custom i {
+    color: #198754;
+}
+
     </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+<!-- <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="/">
     <div class="me-3 d-flex align-items-center justify-content-center overflow-hidden" 
@@ -251,6 +270,85 @@
             <ul class="navbar-nav">
                 </ul>
         </div>
+    </div>
+</nav> -->
+
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+        
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <div class="me-3 d-flex align-items-center justify-content-center overflow-hidden" 
+                style="width: 50px; height: 50px; background: #ffffff; border-radius: 12px;">
+                <img src="{% static 'img/logoeg.png' %}" 
+                     alt="Logo Equipo Guajira" 
+                     style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
+            </div>
+
+            <div class="d-flex flex-column" style="line-height: 1.1;">
+                <span class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 1.25rem;">
+                    Votaciones<span class="text-success">2026</span>
+                </span>
+                <span class="text-success fw-semibold d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-geo-alt-fill me-1" style="font-size: 0.7rem;"></i>
+                    EQUIPO GUAJIRA
+                </span>
+            </div>
+        </a>
+
+        <div class="d-flex align-items-center ms-auto gap-3">
+            
+            <a href="/dashboard/" 
+            class="btn btn-inicio-custom rounded-pill px-3 fw-bold text-dark d-flex align-items-center"
+            style="font-size: 0.85rem; height: 42px;">
+
+                <i class="bi bi-house-door text-success"></i>
+
+                <span class="d-none d-sm-inline ms-2">Inicio</span>
+            </a>
+
+            {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <div class="user-profile-nav shadow-sm d-flex align-items-center" 
+                        id="userMenu" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false" 
+                        style="cursor: pointer; transition: all 0.3s ease; height: 42px;">
+                        
+                        <div class="user-avatar text-uppercase">
+                            {{ user.username|slice:":2" }}
+                        </div>
+                        <div class="user-info d-none d-sm-flex"> 
+                            <span class="user-label">Sesión Iniciada</span>
+                            <span class="user-name">{{ user.username }} <i class="bi bi-chevron-down ms-1 small opacity-50"></i></span>
+                        </div>
+                    </div>
+
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2" 
+                        aria-labelledby="userMenu" 
+                        style="border-radius: 15px; min-width: 200px;">
+                        
+                        <li>
+                            <form action="/logout/" method="post" class="m-0">
+                                {% csrf_token %} 
+                                <button type="submit" class="dropdown-item btn-logout-hover rounded-3 py-2 d-flex align-items-center justify-content-between">
+                                    <span class="fw-medium">Cerrar Sesión</span>
+                                    <i class="bi bi-box-arrow-right fs-5 text-danger"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <a href="/login/" class="btn btn-sm btn-dark rounded-pill px-3">
+                    Iniciar Sesión
+                </a>
+            {% endif %}
+
+            <button class="navbar-toggler border-0 shadow-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="width: 1.2em; height: 1.2em;"></span>
+            </button>
+        </div>
+
     </div>
 </nav>
 
