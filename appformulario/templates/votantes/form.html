@@ -330,6 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
         resetSelect(fMuniPuesto, "Cargando...");
         resetSelect(fCorrePuesto, "---", true);
         resetSelect(selectPuesto, "---", true);
+        resetSelect(selectMesa, "---", true);
         if (!this.value) return;
         fetch(`/personas/ajax/municipios/?departamento_id=${this.value}`)
             .then(res => res.json())
@@ -346,6 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fMuniPuesto.addEventListener("change", function() {
         resetSelect(fCorrePuesto, "Cargando...");
         resetSelect(selectPuesto, "Cargando...", true);
+        resetSelect(selectMesa, "---", true);
         if (!this.value) return;
         fetch(`/personas/ajax/corregimientos/?municipio_id=${this.value}`)
             .then(res => res.json())
@@ -357,7 +359,11 @@ document.addEventListener("DOMContentLoaded", function () {
         cargarPuestos(this.value, fCorrePuesto.value);
     });
 
-    fCorrePuesto.addEventListener("change", () => cargarPuestos(fMuniPuesto.value, fCorrePuesto.value));
+    // fCorrePuesto.addEventListener("change", () => cargarPuestos(fMuniPuesto.value, fCorrePuesto.value));
+    fCorrePuesto.addEventListener("change", () => {
+        resetSelect(selectMesa, "---", true); 
+        cargarPuestos(fMuniPuesto.value, fCorrePuesto.value);
+    });
 
     function cargarPuestos(muniId, correId) {
         resetSelect(selectPuesto, "Cargando...");
