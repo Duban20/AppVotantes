@@ -230,7 +230,7 @@
 
     /* Hover para el botón Nuevo Registro (Azul) */
     .btn-primary-hover:hover {
-        background-color: #1d4ed8 !important; /* Azul más oscuro */
+        background-color: #157347 !important; /* Azul más oscuro */
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
@@ -254,6 +254,28 @@
     .btn-check:checked + .btn-outline-sublider {
         background-color: #7e22ce !important; /* Fondo morado fuerte al estar activo */
         color: white !important;
+    }
+
+    /* Color de la página activa */
+    .pagination .page-item.active .page-link {
+        background-color: #198754 !important; /* Verde success */
+        border-color: #198754 !important;
+        color: white !important;
+    }
+
+    /* Color de los números normales y hover */
+    .pagination .page-link {
+        color: #198754; /* Texto verde para los números no activos */
+    }
+
+    .pagination .page-link:hover {
+        background-color: #f8fffb; /* Fondo verde muy claro al pasar el mouse */
+        color: #146c43;
+    }
+
+    /* Quitar el resplandor azul al hacer click (focus) */
+    .pagination .page-link:focus {
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
     }
 </style>
 
@@ -291,8 +313,8 @@
                             
                             {% if perms.appformulario.add_votante %}
                             <a href="{% url 'crear_votante' %}" 
-                               class="btn btn-primary btn-transition btn-primary-hover border-0 rounded-3 px-3 fw-bold d-flex align-items-center shadow-sm"
-                               style="background: #2563eb; font-size: 0.85rem; height: 42px;">
+                               class="btn btn-success btn-transition btn-primary-hover border-0 rounded-3 px-3 fw-bold d-flex align-items-center shadow-sm"
+                               style="font-size: 0.85rem; height: 42px;">
                                 <i class="bi bi-person-plus-fill me-2"></i> Nuevo Registro
                             </a>
                             {% endif %}
@@ -570,7 +592,7 @@
                                     <div class="d-flex justify-content-center gap-2">
                                         {% if perms.appformulario.change_votante %}
                                         <a href="{% url 'editar_votante' v.id %}" 
-                                        class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center" 
+                                        class="btn btn-sm btn-outline-success border-0 rounded-circle d-flex align-items-center justify-content-center" 
                                         style="width: 35px; height: 35px; transition: all 0.3s;"
                                         title="Editar">
                                             <i class="bi bi-pencil-square fs-5"></i>
@@ -620,54 +642,58 @@
                     </table>
                 </div>
 
-                {% if votantes.has_other_pages %}
+               {% if votantes.has_other_pages %}
                 <nav class="mt-4">
                     <ul class="pagination pagination-sm justify-content-center align-items-center">
                         
                         {% if votantes.has_previous %}
                             <li class="page-item">
                                 <a class="page-link border-0 rounded-pill mx-1 bg-light text-dark shadow-sm" 
-                                href="?page=1&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}" 
-                                title="Primera página">
+                                href="?page=1&q={{ query|default:'' }}&lider_eg={{ lider_filter|default:'' }}&sublider={{ sublider_filter|default:'' }}&rol={{ rol_filter|default:'' }}&status={{ status_filter|default:'' }}">
                                     <i class="bi bi-chevron-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
                                 <a class="page-link border-0 rounded-pill mx-1 text-muted" 
-                                href="?page={{ votantes.previous_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">
+                                href="?page={{ votantes.previous_page_number }}&q={{ query|default:'' }}&lider_eg={{ lider_filter|default:'' }}&sublider={{ sublider_filter|default:'' }}&rol={{ rol_filter|default:'' }}&status={{ status_filter|default:'' }}">
                                     Anterior
                                 </a>
                             </li>
                         {% endif %}
 
-                        <li class="page-item active">
-                            <span class="page-link border-0 rounded-pill mx-2 shadow-sm fw-bold px-3" 
-                                style="background-color: var(--color-primary); min-width: 40px; text-align: center;">
-                                {{ votantes.number }}
-                            </span>
-                        </li>
+                        {% for num in votantes.paginator.page_range %}
+                            {% if votantes.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link border-0 rounded-pill mx-1 shadow-sm fw-bold px-3">
+                                        {{ num }}
+                                    </span>
+                                </li>
+                            {% elif num > votantes.number|add:'-3' and num < votantes.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link border-0 rounded-pill mx-1 text-muted" 
+                                    href="?page={{ num }}&q={{ query|default:'' }}&lider_eg={{ lider_filter|default:'' }}&sublider={{ sublider_filter|default:'' }}&rol={{ rol_filter|default:'' }}&status={{ status_filter|default:'' }}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
 
                         {% if votantes.has_next %}
                             <li class="page-item">
                                 <a class="page-link border-0 rounded-pill mx-1 text-muted" 
-                                href="?page={{ votantes.next_page_number }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}">
+                                href="?page={{ votantes.next_page_number }}&q={{ query|default:'' }}&lider_eg={{ lider_filter|default:'' }}&sublider={{ sublider_filter|default:'' }}&rol={{ rol_filter|default:'' }}&status={{ status_filter|default:'' }}">
                                     Siguiente
                                 </a>
                             </li>
                             <li class="page-item">
                                 <a class="page-link border-0 rounded-pill mx-1 bg-light text-dark shadow-sm" 
-                                href="?page={{ votantes.paginator.num_pages }}&q={{ query|default:'' }}&lider={{ lider_filter|default:'' }}&rol={{ rol_filter|default:'' }}" 
-                                title="Última página">
+                                href="?page={{ votantes.paginator.num_pages }}&q={{ query|default:'' }}&lider_eg={{ lider_filter|default:'' }}&sublider={{ sublider_filter|default:'' }}&rol={{ rol_filter|default:'' }}&status={{ status_filter|default:'' }}">
                                     <i class="bi bi-chevron-double-right"></i>
                                 </a>
                             </li>
                         {% endif %}
 
                     </ul>
-                    
-                    <div class="text-center mt-2">
-                        <small class="text-muted opacity-75">Página {{ votantes.number }} de {{ votantes.paginator.num_pages }}</small>
-                    </div>
                 </nav>
                 {% endif %}
             </div>

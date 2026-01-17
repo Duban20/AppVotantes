@@ -128,7 +128,7 @@ def lista_votantes(request):
     # 5. CONTEXTO
     context = {
         'votantes': page_obj,
-        'query': query,
+        'query': query or '',
         'status_filter': status_filter,
         'rol_filter': rol_filter,
         'lider_filter': lider_filter,
