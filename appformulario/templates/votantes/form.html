@@ -140,6 +140,10 @@
                                     </option>
                                 {% endfor %}
                             </select>
+                            <div id="error-autoseleccion" class="alert alert-danger small py-2 mt-1 mb-0" style="display:none; border-left: 5px solid #dc3545;">
+                                <i class="bi bi-exclamation-octagon-fill"></i> 
+                                <strong>Acción no permitida:</strong> Esta persona está dejando de ser Líder, por lo tanto, debe tener asignado a un líder distinto a ella misma.
+                            </div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-secondary mb-1">Cédula del Líder</label>
@@ -278,13 +282,53 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    // function fillLiderFields() {
+    //     if (!selectLider) return;
+    //     const opt = selectLider.options[selectLider.selectedIndex];
+    //     cedulaInput.value = (opt && opt.value) ? (opt.dataset.cedula || "") : "";
+    //     telefonoInput.value = (opt && opt.value) ? (opt.dataset.telefono || "") : "";
+        
+    //     // Disparar la carga de sublíderes
+    //     if (opt && opt.value) {
+    //         cargarSublideres(opt.value, initSubliderId);
+    //     } else {
+    //         resetSelect(selectSublider, "Seleccione un líder primero", true);
+    //     }
+    // }
+
     function fillLiderFields() {
         if (!selectLider) return;
         const opt = selectLider.options[selectLider.selectedIndex];
+        
+        // --- VALIDACIÓN DE CAMBIO DE ROL Y AUTO-ASIGNACIÓN ---
+        const cedulaLiderSeleccionado = opt ? opt.dataset.cedula : null;
+        const cedulaPersonaActual = document.querySelector("[name='cedula']").value;
+        const msgError = document.getElementById("error-autoseleccion");
+
+        // Si la cédula del líder elegido es la misma que la de la persona que editamos
+        if (cedulaLiderSeleccionado && cedulaPersonaActual && (cedulaLiderSeleccionado === cedulaPersonaActual)) {
+            
+            // 1. Mostrar el mensaje explicativo
+            msgError.style.display = "block";
+            
+            // 2. Resetear campos
+            selectLider.value = ""; 
+            cedulaInput.value = "";
+            telefonoInput.value = "";
+            resetSelect(selectSublider, "Seleccione un líder primero", true);
+            
+            // 3. Alerta detallada
+            // alert("No puedes asignarte a ti mismo como líder responsable.\n\nAl cambiar el rol a Sublíder o Votante, el sistema requiere que selecciones a un Líder de Equipo Guajira diferente para que supervise este registro.");
+            
+            return; // Cortar ejecución
+        } else {
+            if (msgError) msgError.style.display = "none";
+        }
+        // --- FIN VALIDACIÓN ---
+
         cedulaInput.value = (opt && opt.value) ? (opt.dataset.cedula || "") : "";
         telefonoInput.value = (opt && opt.value) ? (opt.dataset.telefono || "") : "";
         
-        // Disparar la carga de sublíderes
         if (opt && opt.value) {
             cargarSublideres(opt.value, initSubliderId);
         } else {

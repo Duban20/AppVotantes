@@ -106,14 +106,14 @@ class Votante(models.Model):
 
     lider_eg = models.ForeignKey(
         'LiderEG',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='votantes'
     )
 
     sublider = models.ForeignKey(
         'SubLider',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='votantes'
     )
