@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'appformulario.apps.AppformularioConfig',
     'smart_selects',
     'simple_history',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'es-co'
 
 TIME_ZONE = 'America/Bogota'
 

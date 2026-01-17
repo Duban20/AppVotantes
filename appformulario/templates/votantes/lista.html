@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block title %}Gestión de Personas{% endblock %}
 
 {% block content %}
@@ -331,7 +332,7 @@
                                     <i class="bi bi-star-fill"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark">{{ total_lideres|default:"0" }}</h6>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ total_lideres|default:"0"|intcomma }}</h6>
                                     <small class="text-muted text-xsmall fw-bold text-uppercase">Líderes EG</small>
                                 </div>
                             </div>
@@ -345,7 +346,7 @@
                                     <i class="bi bi-person-badge-fill"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark">{{ total_sublideres|default:"0" }}</h6>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ total_sublideres|default:"0"|intcomma }}</h6>
                                     <small class="text-muted text-xsmall fw-bold text-uppercase">Sublíderes</small>
                                 </div>
                             </div>
@@ -359,7 +360,7 @@
                                     <i class="bi bi-person-fill"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark">{{ total_votantes|default:"0" }}</h6>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ total_votantes|default:"0"|intcomma }}</h6>
                                     <small class="text-muted text-xsmall fw-bold text-uppercase">Votantes</small>
                                 </div>
                             </div>
@@ -373,7 +374,7 @@
                                     <i class="bi bi-people-fill"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark">{{ votantes.paginator.count }}</h6>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ votantes.paginator.count|intcomma }}</h6>
                                     <small class="text-muted text-xsmall fw-bold text-uppercase">Total Filtro</small>
                                 </div>
                             </div>
