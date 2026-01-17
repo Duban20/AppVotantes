@@ -13,12 +13,62 @@ from AppPuestoVotacion.models import PuestoVotacion
 from appcorregimientos.models import Corregimiento
 
 from .forms import VotanteForm
-from .models import Votante
+from .models import LiderEG, SubLider, Votante
 from django.http import JsonResponse
 from appmesa.models import Mesa
 from io import BytesIO
 import pandas as pd
 
+
+# @login_required
+# @permission_required('appformulario.view_votante', raise_exception=True)
+# def lista_votantes(request):
+#     query = request.GET.get('q')
+#     status_filter = request.GET.get('status')
+#     rol_filter = request.GET.get('rol')
+#     lider_filter = request.GET.get('lider') 
+    
+#     # Es importante ordenar los resultados para que la paginación sea consistente
+#     votantes_list = Votante.objects.all().order_by('-id') # O por 'apellido'
+
+#     # Aplicar el filtro de estado si existe
+#     if status_filter:
+#         votantes_list = votantes_list.filter(status=status_filter)
+
+#     # Aplicar el filtro de rol si existe
+#     if rol_filter:
+#         votantes_list = votantes_list.filter(rol=rol_filter)
+
+#     if lider_filter:
+#         votantes_list = votantes_list.filter(lider_eg_id=lider_filter)
+    
+#     # Aplicar el filtro de búsqueda general (q)
+#     if query:
+#         votantes_list = votantes_list.filter(
+#             Q(nombre__icontains=query) |
+#             Q(apellido__icontains=query) |
+#             Q(cedula__icontains=query) |
+#             Q(puesto_votacion__nombre_lugar__icontains=query)
+#         )
+
+
+#     lideres = LiderEG.objects.filter(
+#         votantes__isnull=False
+#     ).distinct()
+    
+#     # --- LÓGICA DE PAGINACIÓN ---
+#     paginator = Paginator(votantes_list, 10) # Muestra 10 votantes por página
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+
+#     return render(request, 'votantes/lista.html', {
+#         'votantes': page_obj, # Ahora pasamos el objeto paginado
+#         'query': query,
+#         'status_filter': status_filter,
+#         'rol_filter': rol_filter,
+#         'lider_filter': lider_filter,
+#         'lideres': lideres,
+#     })
 
 @login_required
 @permission_required('appformulario.view_votante', raise_exception=True)
@@ -26,50 +76,72 @@ def lista_votantes(request):
     query = request.GET.get('q')
     status_filter = request.GET.get('status')
     rol_filter = request.GET.get('rol')
-    lider_filter = request.GET.get('lider') 
-    
-    # Es importante ordenar los resultados para que la paginación sea consistente
-    votantes_list = Votante.objects.all().order_by('-id') # O por 'apellido'
+    lider_filter = request.GET.get('lider_eg')
+    sublider_filter = request.GET.get('sublider')
 
-    # Aplicar el filtro de estado si existe
+    # 1. CONTADORES GLOBALES (Sin cambios)
+    total_lideres = Votante.objects.filter(rol='LIDER_EG').count()
+    total_sublideres = Votante.objects.filter(rol='SUBLIDER').count()
+    total_votantes = Votante.objects.filter(rol='VOTANTE').count()
+
+    # 2. QUERYSET BASE
+    votantes_list = Votante.objects.all().select_related(
+        'lider_eg__votante', 
+        'sublider__votante', 
+        'puesto_votacion'
+    ).order_by('-id')
+
+    # 3. APLICACIÓN DE FILTROS
     if status_filter:
         votantes_list = votantes_list.filter(status=status_filter)
 
-    # Aplicar el filtro de rol si existe
     if rol_filter:
         votantes_list = votantes_list.filter(rol=rol_filter)
 
     if lider_filter:
-        votantes_list = votantes_list.filter(lider_asignado_id=lider_filter)
+        votantes_list = votantes_list.filter(lider_eg_id=lider_filter)
+
+    if sublider_filter:
+        votantes_list = votantes_list.filter(sublider_id=sublider_filter)
     
-    # Aplicar el filtro de búsqueda general (q)
     if query:
         votantes_list = votantes_list.filter(
             Q(nombre__icontains=query) |
             Q(apellido__icontains=query) |
             Q(cedula__icontains=query) |
-            Q(puesto_votacion__nombre_lugar__icontains=query)
+            Q(puesto_votacion__nombre_lugar__icontains=query) 
         )
 
+    # --- LÓGICA DE FILTROS DEPENDIENTES ---
+    lideres_list = LiderEG.objects.all()
+    sublideres_list = SubLider.objects.all()
 
-    lideres = Votante.objects.filter(
-        rol='LIDER_VOTANTE',
-        votantes_asignados__isnull=False
-    ).distinct()
+    # Si hay un líder seleccionado, filtramos los sublíderes que le pertenecen
+    if lider_filter:
+        sublideres_list = sublideres_list.filter(lider_eg_id=lider_filter)
     
-    # --- LÓGICA DE PAGINACIÓN ---
-    paginator = Paginator(votantes_list, 10) # Muestra 10 votantes por página
+    # 4. PAGINACIÓN (Sin cambios)
+    paginator = Paginator(votantes_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'votantes/lista.html', {
-        'votantes': page_obj, # Ahora pasamos el objeto paginado
+    # 5. CONTEXTO
+    context = {
+        'votantes': page_obj,
         'query': query,
         'status_filter': status_filter,
         'rol_filter': rol_filter,
         'lider_filter': lider_filter,
-        'lideres': lideres,
-    })
+        'sublider_filter': sublider_filter,
+        'lideres_list': lideres_list,
+        'sublideres_list': sublideres_list, # Ahora esta lista viene filtrada si hay un líder
+        'total_lideres': total_lideres,
+        'total_sublideres': total_sublideres,
+        'total_votantes': total_votantes,
+    }
+
+    return render(request, 'votantes/lista.html', context)
+
 
 @login_required
 @permission_required('appformulario.add_votante', raise_exception=True)
@@ -214,6 +286,23 @@ def obtener_puestos_por_ubicacion(request):
     ]
     return JsonResponse({"puestos": data})
 
+def ajax_get_sublideres(request):
+    lider_eg_id = request.GET.get('lider_eg_id')
+    sublideres = SubLider.objects.filter(
+        lider_eg_id=lider_eg_id, 
+        votante__status='ACTIVE'
+    ).select_related('votante')
+    
+    # Creamos una lista de diccionarios con la info necesaria
+    data = [
+        {
+            'id': s.id, 
+            'nombre': f"{s.votante.nombre} {s.votante.apellido}"
+        } 
+        for s in sublideres
+    ]
+    return JsonResponse({'sublideres': data})
+
 
 # -----------------------------------------------------------------------
 # Función para exportar a Excel
@@ -226,7 +315,7 @@ def exportar_votantes_excel(request):
         return value if value not in [None, '', ' '] else '-'
 
     # Obtener solo votantes activos
-    votantes = Votante.objects.filter(status='ACTIVE').select_related(
+    votantes = Votante.objects.all().select_related(
         'departamento_residencia',
         'municipio_residencia',
         'corregimiento_residencia',
@@ -235,7 +324,10 @@ def exportar_votantes_excel(request):
         'puesto_votacion__municipio',
         'puesto_votacion__corregimiento',
         'mesa',
-        'lider_asignado'
+        'lider_eg',
+        'lider_eg__votante', 
+        'sublider',            
+        'sublider__votante'
     )
 
     data = []
@@ -254,6 +346,7 @@ def exportar_votantes_excel(request):
 
         data.append({
             # ----- DATOS DEL VOTANTE -----
+            'Estado': safe(v.get_status_display()),
             'Rol': safe(v.get_rol_display()),
             'Nombres': safe(v.nombre),
             'Apellidos': safe(v.apellido),
@@ -296,11 +389,16 @@ def exportar_votantes_excel(request):
             # ----- MESA -----
             'Mesa': safe(v.mesa.numero if v.mesa else None),
 
-            # ----- LÍDER -----
-            'Líder asignado': safe(
-                f"{v.lider_asignado.nombre} {v.lider_asignado.apellido}"
-                if v.lider_asignado else None
+            # ----- JERARQUÍA (Líder y Sublíder) -----
+            'Líder EG': safe(
+                f"{v.lider_eg.votante.nombre} {v.lider_eg.votante.apellido}"
+                if v.lider_eg else None
             ),
+            'Sublíder': safe(
+                f"{v.sublider.votante.nombre} {v.sublider.votante.apellido}"
+                if v.sublider else None
+            ),
+            'Motivo Inactivación': safe(v.motivo_inactivacion) if v.status == 'INACTIVE' else '-'
         })
 
     # Crear DataFrame

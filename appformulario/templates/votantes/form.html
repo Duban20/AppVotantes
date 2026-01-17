@@ -129,16 +129,16 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary mb-1">Líder responsable</label>
-                            <select id="id_lider_asignado" name="lider_asignado" class="form-select">
+                            <select id="id_lider_eg" name="lider_eg" class="form-select">
                                 <option value="">Sin líder asignado</option>
-                                {% with selected=form.lider_asignado.value %}
-                                    {% for lider in form.fields.lider_asignado.queryset %}
-                                        <option value="{{ lider.id }}" data-cedula="{{ lider.cedula }}" data-telefono="{{ lider.telefono }}"
-                                            {% if selected|stringformat:"s" == lider.id|stringformat:"s" %}selected{% endif %}>
-                                            {{ lider.nombre }} {{ lider.apellido }}
-                                        </option>
-                                    {% endfor %}
-                                {% endwith %}
+                                {% for lider in form.fields.lider_eg.queryset %}
+                                    <option value="{{ lider.id }}" 
+                                        {% if form.lider_eg.value|slugify == lider.id|slugify %}selected{% endif %}
+                                        data-cedula="{{ lider.votante.cedula }}"
+                                        data-telefono="{{ lider.votante.telefono }}">
+                                        {{ lider.votante.nombre }} {{ lider.votante.apellido }}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -148,6 +148,12 @@
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-secondary mb-1">Teléfono del Líder</label>
                             <input id="telefono_lider" class="form-control bg-light" readonly tabindex="-1">
+                        </div>
+                        <div class="col-md-6" id="container_sublider">
+                            <label class="form-label small fw-bold text-secondary mb-1">Sublíder (Opcional)</label>
+                            <select id="id_sublider" name="sublider" class="form-select" disabled>
+                                <option value="">Seleccione un líder primero</option>
+                            </select>
                         </div>
                     </div>
 
@@ -226,7 +232,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectMuniRes = document.getElementById("id_municipio_residencia");
     const selectCorrRes = document.getElementById("id_corregimiento_residencia");
 
-    const selectLider = document.getElementById("id_lider_asignado");
+    const selectLider = document.getElementById("id_lider_eg");
+    const selectSublider = document.getElementById("id_sublider");
+    const containerSublider = document.getElementById("container_sublider");
     const cedulaInput = document.getElementById("cedula_lider");
     const telefonoInput = document.getElementById("telefono_lider");
     const roleSelect = document.querySelector("[name='rol']");
@@ -237,6 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const initPuestoId = "{{ form.puesto_votacion.value|default:'' }}";
     const initMesaId   = "{{ form.mesa.value|default:'' }}";
+    const initSubliderId = "{{ form.sublider.value|default:'' }}";
     const initMuniPuestoId = "{% if form.instance.puesto_votacion %}{{ form.instance.puesto_votacion.municipio.id }}{% endif %}";
     const initCorrePuestoId = "{% if form.instance.puesto_votacion %}{{ form.instance.puesto_votacion.corregimiento.id|default:'' }}{% endif %}";
 
@@ -249,11 +258,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
     // 1. LÓGICA LÍDER (MENSAJE, BLOQUEO Y AUTO-RELLENO)
     // ==========================================
+    function cargarSublideres(liderId, selectedId = null) {
+        if (!liderId) {
+            resetSelect(selectSublider, "Seleccione un líder primero", true);
+            return;
+        }
+
+        resetSelect(selectSublider, "Cargando sublíderes...", true);
+
+        fetch(`/personas/ajax/sublideres/?lider_eg_id=${liderId}`)
+            .then(res => res.json())
+            .then(data => {
+                resetSelect(selectSublider, "Sin sublíder (Directo con Líder)", false);
+                data.sublideres.forEach(s => {
+                    const opt = new Option(s.nombre, s.id);
+                    if (s.id == selectedId) opt.selected = true;
+                    selectSublider.add(opt);
+                });
+            });
+    }
+
     function fillLiderFields() {
         if (!selectLider) return;
         const opt = selectLider.options[selectLider.selectedIndex];
         cedulaInput.value = (opt && opt.value) ? (opt.dataset.cedula || "") : "";
         telefonoInput.value = (opt && opt.value) ? (opt.dataset.telefono || "") : "";
+        
+        // Disparar la carga de sublíderes
+        if (opt && opt.value) {
+            cargarSublideres(opt.value, initSubliderId);
+        } else {
+            resetSelect(selectSublider, "Seleccione un líder primero", true);
+        }
     }
 
     if (selectLider && roleSelect) {
@@ -268,14 +304,25 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function toggleLeaderSelect(val) {
-            const isLeader = val.toString().toUpperCase().includes("LIDER");
-            if (isLeader) {
-                selectLider.disabled = true;
-                selectLider.value = "";
-                fillLiderFields();
+            const isLeaderEG = val === "LIDER_EG";
+            const isSubLider = val === "SUBLIDER";
+            
+            if (isLeaderEG) {
+                selectLider.value = ""; 
+                selectLider.style.pointerEvents = "none";
+                selectLider.style.backgroundColor = "#f8f9fa";
+                containerSublider.style.display = "none"; // Ocultar sublíder si es Líder EG
                 infoMsg.style.display = "block";
+            } else if (isSubLider) {
+                selectLider.style.pointerEvents = "auto";
+                selectLider.style.backgroundColor = "#fff";
+                containerSublider.style.display = "none"; // Ocultar sublíder si la persona es Sublíder
+                infoMsg.style.display = "none";
             } else {
-                selectLider.disabled = false;
+                // Caso VOTANTE: Ve ambos campos
+                selectLider.style.pointerEvents = "auto";
+                selectLider.style.backgroundColor = "#fff";
+                containerSublider.style.display = "block"; 
                 infoMsg.style.display = "none";
             }
         }

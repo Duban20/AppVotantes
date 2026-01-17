@@ -14,8 +14,9 @@ class Votante(models.Model):
     ]
 
     ROLES = [
-        ('LIDER_VOTANTE', 'Líder'),
         ('VOTANTE', 'Votante'),
+        ('LIDER_EG', 'Líder Equipo Guajira'),
+        ('SUBLIDER', 'Sublíder'),
     ]
 
     rol = models.CharField(
@@ -103,14 +104,18 @@ class Votante(models.Model):
         help_text="Seleccione."
     )
 
-    # Un votante puede tener un líder
-    lider_asignado = models.ForeignKey(
-        'self',
+    lider_eg = models.ForeignKey(
+        'LiderEG',
         on_delete=models.PROTECT,
         null=True, blank=True,
-        related_name='votantes_asignados',
-        limit_choices_to={'rol': 'LIDER_VOTANTE'},
-        verbose_name="Líder Responsable"
+        related_name='votantes'
+    )
+
+    sublider = models.ForeignKey(
+        'SubLider',
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='votantes'
     )
 
     status = models.CharField(
@@ -141,3 +146,38 @@ class Votante(models.Model):
         ]
         verbose_name = "votante"
         verbose_name_plural = "votantes"
+
+
+
+# TABLA LIDEREG
+class LiderEG(models.Model):
+    votante = models.OneToOneField(
+        Votante,
+        on_delete=models.CASCADE,
+        related_name='perfil_lider_eg'
+    )
+
+    # fecha_asignacion = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Líder EG: {self.votante}"
+
+
+# TABLA SUBLIDER
+class SubLider(models.Model):
+    votante = models.OneToOneField(
+        Votante,
+        on_delete=models.CASCADE,
+        related_name='perfil_sublider'
+    )
+
+    lider_eg = models.ForeignKey(
+        LiderEG,
+        on_delete=models.PROTECT,
+        related_name='sublideres'
+    )
+
+    # fecha_asignacion = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Sublíder: {self.votante}"

@@ -20,4 +20,5 @@ urlpatterns = [
     path('ajax/corregimientos/', views.obtener_corregimientos_por_municipio, name='ajax_corregimientos'),
     path('ajax/municipios/', views.obtener_municipios_por_departamento, name='ajax_municipios'),
     path('ajax/puestos/', views.obtener_puestos_por_ubicacion, name='ajax_puestos'),
+    path('ajax/sublideres/', views.ajax_get_sublideres, name='ajax_get_sublideres')
 ]
